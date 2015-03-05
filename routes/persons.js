@@ -49,7 +49,6 @@ router.post("/", function(req, res, next) {
         "name": "John Doe",
         "sidome": {
             "default": true, // the sidome is a cube by default
-            "zDelta": 0.0,   // Z distance from the display point to the sidome
             "nodes": {
                 "node1": 0.00, // from -10 to +10
                 "node2": 0.00, // each node represent a variable
@@ -60,14 +59,21 @@ router.post("/", function(req, res, next) {
                 "node7": 0.00,
                 "node8": 0.00
             },
-            "xyShift": 0.0,     // not sure yet, but we can use this to represent the position of the sidome in the plan
-            "angle": 180,       // angle of the plan in wich the sidome moves
-            "visible": "true"
+            "ellipse": {
+                "dx": 0,
+                "dy": 0
+            },
+            "color": {
+                "r": 255,
+                "g": 255,
+                "b": 255
+            }
         },
         "twitter": {
             "twitterId": "@devnull",
-            "lastTweet": 1425511145
-        }
+            "lastTweet": 1425511145 // timestamp of the last tweet with #sido
+        },
+        "badge": 1234
     };
 
     // index the person to elasticsearch
