@@ -63,23 +63,6 @@ Content-Type: application/json; charset=utf-8
     "_source": {
       "_id": 1,
       "name": "John Doe",
-      "sidome": {
-        "default": true,
-        "zDelta": 0,
-        "nodes": {
-          "node1": 0,
-          "node2": 0,
-          "node3": 0,
-          "node4": 0,
-          "node5": 0,
-          "node6": 0,
-          "node7": 0,
-          "node8": 0
-        },
-        "xyShift": 0,
-        "angle": 180,
-        "visible": "true"
-      },
       "twitter": {
         "twitterId": "@devnull",
         "lastTweet": 1425511145

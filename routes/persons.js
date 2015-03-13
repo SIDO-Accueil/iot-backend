@@ -39,6 +39,7 @@ router.get("/", function(req, res, next) {
         res.send(hits);
     }, function (error) {
         console.trace(error.message);
+        res.send(error.message);
     });
 });
 
@@ -47,28 +48,6 @@ router.post("/", function(req, res, next) {
     var pers = {
         "_id": 1,
         "name": "John Doe",
-        "sidome": {
-            "default": true, // the sidome is a cube by default
-            "nodes": {
-                "node1": 0.00, // from -10 to +10
-                "node2": 0.00, // each node represent a variable
-                "node3": 0.00, // variables represent answers given
-                "node4": 0.00, // by the person
-                "node5": 0.00,
-                "node6": 0.00,
-                "node7": 0.00,
-                "node8": 0.00
-            },
-            "ellipse": {
-                "dx": 0,
-                "dy": 0
-            },
-            "color": {
-                "r": 255,
-                "g": 255,
-                "b": 255
-            }
-        },
         "twitter": {
             "twitterId": "@devnull",
             "lastTweet": 1425511145 // timestamp of the last tweet with #sido
