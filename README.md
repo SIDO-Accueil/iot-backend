@@ -143,7 +143,7 @@ Accept: application/json
 We some random persons in our database
 
 # Ressource Sidome (avatar)
-## POST /sidomes/<nobadge>
+## POST /sidomes
 ```
 Content-type: application/json
 Accept: application/json
@@ -152,7 +152,7 @@ Accept: application/json
 ```json
 {
     "id": "<nobadge>",
-    "id": "<Person IRI>",
+    "person": "<Person IRI>",
     "default": true,
     "visible": true,
     "color": {

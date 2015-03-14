@@ -97,5 +97,24 @@ router.post("/fill", function(req, res) {
 
 });
 
+// POST /sidomes (ajout du sidome dans notre base)
+router.post("/", function(req, res) {
+    // get the json in the request payload
+    var p = req.body;
+
+    client.index({
+        index: "sidomes",
+        type: "sidomes",
+        id: p.id,
+        body: p
+    }).then(function(d) {
+        if (!d.created) {
+            res.status(400);
+            res.send({"created": d.created});
+        }
+        res.status(201);
+        res.send({"created": d.created});
+    });
+});
 
 module.exports = router;
