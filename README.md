@@ -33,19 +33,19 @@ if everything goes fine, you should read be able to read "ElasticSearch: OK" in 
 # API
 
 # Ressource Person
-## GET /persons/<nobadge>
+## GET /persons/id
 ### description
 We do a GET on the REST API provided by SIdO organizers, and return it
 ### Resp
 ```json
 {
-        "id": 424242,
-        "civilite": "M.",
-        "nom": "Doe",
-        "prenom": "John",
-        "twitter": "@johndoe",
-        "email": "john@doe.me"
-    }
+    "id": 424242,
+    "civilite": "M.",
+    "nom": "Doe",
+    "prenom": "John",
+    "twitter": "@johndoe",
+    "email": "john@doe.me"
+}
 ```
 OR if the Person is not in the database:
 ```
@@ -55,7 +55,7 @@ HTTP return code 404
 {}
 ```
 
-## POST /persons/<nobadge>
+## POST /persons
 ```
 Content-type: application/json
 Accept: application/json
@@ -63,7 +63,7 @@ Accept: application/json
 ### request payload
 ```json
 {
-    "id": "<nobadge>",
+    "id": id,
     "civilite": "",
     "nom": "",
     "prenom": "",
@@ -73,19 +73,16 @@ Accept: application/json
 ```
 ### description
 We add the datas to our own database
-### Resp
+### RESP
 201 CREATED
 ```json
-{
-  "created": true
-}
+{"created": true}
 ```
-## POST /persons/fill (DEV ONLY)
+OR
+409 Conflict
+```json
+{"created": false}
 ```
-Accept: application/json
-```
-### description
-We some random persons in our database
 
 # Ressource Sidome (avatar)
 ## POST /sidomes
@@ -201,7 +198,7 @@ We some random sidomes in our database
 # USE CASE
 ## Get information from the SIdO organisers API
 ### REQ
-GET /persons/<id>
+GET /persons/id
 ### RESP
 ```json
 {
