@@ -29,7 +29,7 @@ client.cluster.health()
 
 
 /* GET persons listing. */
-router.get("/", function(req, res, next) {
+router.get("/", function(req, res) {
     client.search({
         "index": "sidomes",
         "size": 10000,
@@ -38,7 +38,14 @@ router.get("/", function(req, res, next) {
 
         // get all matchings persons
         var hits = body.hits.hits;
-        res.send(hits);
+        var ans = [];
+
+        hits.forEach(function(j){
+            //noinspection Eslint
+            ans.push(j._source.sidome);
+        });
+
+        res.send(ans);
     }, function (error) {
         console.trace(error.message);
         res.send(error.message);
@@ -46,8 +53,8 @@ router.get("/", function(req, res, next) {
 });
 
 /* Create a new person with a default sidome */
-router.post("/", function(req, res, next) {
-    var MAXUSER = 100;
+router.post("/", function(req, res) {
+    var MAXUSER = 10000;
 
     var allPromises = [];
 
@@ -74,7 +81,14 @@ router.post("/", function(req, res, next) {
 
             // get all matchings persons
             var hits = body.hits.hits;
-            res.send(hits);
+            var ans = [];
+
+            hits.forEach(function(j){
+                //noinspection Eslint
+                ans.push(j._source.sidome);
+            });
+
+            res.send(ans);
         }, function (error) {
             console.trace(error.message);
             res.send(error.message);
