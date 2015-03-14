@@ -132,13 +132,7 @@ We add the datas to our own database
 201 CREATED
 ```json
 {
-    "id": "<nobadge>",
-    "sidome": "<avatar IRI>",
-    "civilite": "",
-    "nom": "",
-    "prenom": "",
-    "twitter": "",
-    "email": ""
+  "created": true
 }
 ```
 ## POST /persons/fill (DEV ONLY)

@@ -68,8 +68,8 @@ router.get("/:id", function(req, res) {
     });
 });
 
-/* Create a new person with a default sidome */
-router.post("/fill", function(req, res, next) {
+/* Create new randoms persons */
+router.post("/fill", function(req, res) {
     var MAXUSER = 1000;
 
     var allPromises = [];
@@ -110,8 +110,28 @@ router.post("/fill", function(req, res, next) {
             res.send(error.message);
         });
     });
-
 });
 
+/* Create new Person */
+router.post("/:id", function(req, res) {
+    // get the json in the request payload
+    console.log(req);
+
+    var p = req.body;
+
+    client.index({
+        index: "persons",
+        type: "persons",
+        id: p.id,
+        body: p
+    }).then(function(d) {
+        if (!d.created) {
+            res.status(400);
+            res.send({"created": d.created});
+        }
+        res.status(201);
+        res.send({"created": d.created});
+    });
+});
 
 module.exports = router;
