@@ -93,7 +93,7 @@ Accept: application/json
 ### request payload
 ```json
 {
-    "id": "<nobadge>",
+    "id": id,
     "person": "<Person IRI>",
     "default": true,
     "visible": true,
@@ -125,50 +125,7 @@ Accept: application/json
                 "face4": 7
             }
         },
-        "node3": {
-            "x": 0,
-            "y": 1,
-            "z": 0,
-            "faces": {
-                "face1": 1,
-                "face2": 2,
-                "face3": 3,
-                "face4": 4
-            }
-        },
-        "node4": {
-            "x": 1,
-            "y": 0,
-            "z": 0,
-            "faces": {
-                "face1": 2,
-                "face2": 3,
-                "face3": 5,
-                "face4": 6
-            }
-        },
-        "node5": {
-            "x": 0,
-            "y": 0,
-            "z": -1,
-            "faces": {
-                "face1": 3,
-                "face2": 4,
-                "face3": 6,
-                "face4": 8
-            }
-        },
-        "node6": {
-            "x": 0,
-            "y": -1,
-            "z": 0,
-            "faces": {
-                "face1": 5,
-                "face2": 6,
-                "face3": 7,
-                "face4": 8
-            }
-        }
+        ...
     }
 }
 ```
@@ -176,7 +133,10 @@ Accept: application/json
 We add the sidome to our own database
 ### Resp
 201 CREATED
-same json as the entry
+
+OR
+
+409 Conflict
 
 # Ressource Sidome (avatar)
 ## PUT /sidomes/<nobadge>
@@ -188,12 +148,6 @@ Accept: application/json
 a sidome representation
 ### description
 We update the sidome in our database
-## POST /sidomes/fill (DEV ONLY)
-```
-Accept: application/json
-```
-### description
-We some random sidomes in our database
 
 # USE CASE
 ## Get information from the SIdO organisers API
@@ -237,4 +191,50 @@ OR
 
 ## POST a new default sidome to this backend
 ### REQ
+```HTTP
+POST /sidomes
+```
+```json
+{
+    "id": id,
+    "person": "<Person IRI>",
+    "default": true,
+    "visible": true,
+    "color": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+    },
+    "nodes": {
+        "node1": {
+            "x": -1,
+            "y": 0,
+            "z": 0,
+            "faces": {
+                "face1": 1,
+                "face2": 4,
+                "face3": 7,
+                "face4": 8
+            }
+        },
+        "node2": {
+            "x": 0,
+            "y": 0,
+            "z": 1,
+            "faces": {
+                "face1": 1,
+                "face2": 2,
+                "face3": 5,
+                "face4": 7
+            }
+        },
+        ...
+    }
+}
+```
+### RESP
+201 CREATED
 
+OR
+
+409 Conflict

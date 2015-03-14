@@ -109,11 +109,12 @@ router.post("/", function(req, res) {
         body: p
     }).then(function(d) {
         if (!d.created) {
-            res.status(400);
+            res.status(409);
+            res.send({"created": d.created});
+        } else {
+            res.status(201);
             res.send({"created": d.created});
         }
-        res.status(201);
-        res.send({"created": d.created});
     });
 });
 
