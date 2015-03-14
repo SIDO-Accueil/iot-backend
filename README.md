@@ -80,27 +80,13 @@ We do a GET on the REST API provided by SIdO organizers, and return it
 ### Resp
 ```json
 {
-    "id": "<nobadge>",
-    "civilite": "",
-    "nom": "",
-    "prenom": "",
-    "email": "",
-    "telephone": "",
-    "adresse": "",
-    "code-postal": "",
-    "ville": "",
-    "pays": "",
-    "linkedin": "",
-    "twitter": "",
-    "entreprise": "",
-    "type-entreprise": "",
-    "chiffre-affaire":"",
-    "nb-salaries": "",
-    "secteur": "",
-    "service": "",
-    "fonction": "",
-    "site-web": ""
-}
+        "id": 424242,
+        "civilite": "M.",
+        "nom": "Doe",
+        "prenom": "John",
+        "twitter": "@johndoe",
+        "email": "john@doe.me"
+    }
 ```
 OR if the Person is not in the database:
 ```

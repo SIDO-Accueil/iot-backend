@@ -51,28 +51,21 @@ router.get("/", function(req, res) {
     });
 });
 
-/* GET one persons. */
+/* GET one persons from Dorian API*/
 router.get("/:id", function(req, res) {
-    client.search({
-        index: "persons",
-        q: req.params.id
-    }).then(function (body) {
 
-        // get all matchings persons
-        var hits = body.hits.hits;
-
-        //noinspection Eslint
-        if (hits.length !== 1 || !hits[0]._source) {
-            res.status(500).end();
-        }
-
-        //noinspection Eslint
-        res.send(hits[0]._source);
-
-    }, function (error) {
-        console.trace(error.message);
-        res.send(error.message);
-    });
+    // TODO DO THE HTTP GET on the Dorian API
+    // TODO RETURN 404 if not found
+    // TODO remove this mock:
+    var p = {
+        "id": req.params.id,
+        "civilite": "M.",
+        "nom": "Doe",
+        "prenom": "John",
+        "twitter": "@johndoe",
+        "email": "john@doe.me"
+    };
+    res.send(p);
 });
 
 /* Create new randoms persons */
