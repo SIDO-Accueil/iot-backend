@@ -239,3 +239,46 @@ Accept: application/json
 ### description
 We some random sidomes in our database
 
+# use case
+## Get information from the SIdO organisers API
+### REQ
+GET /persons/<id>
+### RESP
+```json
+{
+    "id": "4243",
+    "civilite": "M.",
+    "nom": "Doe",
+    "prenom": "John",
+    "twitter": "@johndoe",
+    "email": "john@doe.me"
+}
+```
+## POST theses informations to this backend
+### REQ
+POST /persons
+
+```json
+{
+"id": "4243",
+"civilite": "M.",
+"nom": "Doe",
+"prenom": "John",
+"twitter": "@johndoe",
+"email": "john@doe.me"
+}
+```
+### RESP
+201 CREATED
+```json
+{"created": true}
+```
+OR
+409 Conflict
+```json
+{"created": false}
+```
+
+## POST a new default sidome to this backend
+### REQ
+
