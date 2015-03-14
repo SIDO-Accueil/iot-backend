@@ -113,7 +113,7 @@ router.post("/fill", function(req, res) {
 });
 
 /* Create new Person */
-router.post("/:id", function(req, res) {
+router.post("/", function(req, res) {
     // get the json in the request payload
     console.log(req);
 
