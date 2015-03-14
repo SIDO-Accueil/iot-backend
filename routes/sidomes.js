@@ -60,9 +60,11 @@ router.get("/:id", function(req, res) {
         if (body.hits.total > 1) {
             // error 500
             res.status(500);
+            res.send();
         } else if (body.hits.total === 0) {
             // 404
             res.status(404);
+            res.send();
         } else {
             //noinspection Eslint
             res.send(body.hits.hits[0]._source);
@@ -85,9 +87,12 @@ router.put("/", function(req, res) {
             // multiples results matchs
             // error 500
             res.status(500);
+            res.send();
+
         } else if (body.hits.total === 0) {
             // 404
             res.status(404);
+            res.send();
         } else {
 
             // the existing sidome has been found
