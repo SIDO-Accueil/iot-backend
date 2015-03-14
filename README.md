@@ -71,3 +71,178 @@ Content-Type: application/json; charset=utf-8
   }
 ]
 ```
+
+
+# Ressource Person
+## GET /persons/<nobadge>
+### description
+We do a GET on the REST API provided by SIdO organizers, and return it
+### Resp
+```json
+{
+    "id": "<nobadge>",
+    "civilite": "",
+    "nom": "",
+    "prenom": "",
+    "email": "",
+    "telephone": "",
+    "adresse": "",
+    "code-postal": "",
+    "ville": "",
+    "pays": "",
+    "linkedin": "",
+    "twitter": "",
+    "entreprise": "",
+    "type-entreprise": "",
+    "chiffre-affaire":"",
+    "nb-salaries": "",
+    "secteur": "",
+    "service": "",
+    "fonction": "",
+    "site-web": ""
+}
+```
+OR if the Person is not in the database:
+```
+HTTP return code 404
+```
+```json
+{}
+```
+
+## POST /persons/<nobadge>
+```
+Content-type: application/json
+Accept: application/json
+```
+### request payload
+```json
+{
+    "id": "<nobadge>",
+    "civilite": "",
+    "nom": "",
+    "prenom": "",
+    "twitter": "",
+    "email": ""
+}
+```
+### description
+We add the datas to our own database
+### Resp
+201 CREATED
+```json
+{
+    "id": "<nobadge>",
+    "sidome": "<avatar IRI>",
+    "civilite": "",
+    "nom": "",
+    "prenom": "",
+    "twitter": "",
+    "email": ""
+}
+```
+
+# Ressource Sidome (avatar)
+## POST /sidomes/<nobadge>
+```
+Content-type: application/json
+Accept: application/json
+```
+### request payload
+```json
+{
+    "id": "<nobadge>",
+    "id": "<Person IRI>",
+    "default": true,
+    "visible": true,
+    "color": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+    },
+    "nodes": {
+        "node1": {
+            "x": -1,
+            "y": 0,
+            "z": 0,
+            "faces": {
+                "face1": 1,
+                "face2": 4,
+                "face3": 7,
+                "face4": 8
+            }
+        },
+        "node2": {
+            "x": 0,
+            "y": 0,
+            "z": 1,
+            "faces": {
+                "face1": 1,
+                "face2": 2,
+                "face3": 5,
+                "face4": 7
+            }
+        },
+        "node3": {
+            "x": 0,
+            "y": 1,
+            "z": 0,
+            "faces": {
+                "face1": 1,
+                "face2": 2,
+                "face3": 3,
+                "face4": 4
+            }
+        },
+        "node4": {
+            "x": 1,
+            "y": 0,
+            "z": 0,
+            "faces": {
+                "face1": 2,
+                "face2": 3,
+                "face3": 5,
+                "face4": 6
+            }
+        },
+        "node5": {
+            "x": 0,
+            "y": 0,
+            "z": -1,
+            "faces": {
+                "face1": 3,
+                "face2": 4,
+                "face3": 6,
+                "face4": 8
+            }
+        },
+        "node6": {
+            "x": 0,
+            "y": -1,
+            "z": 0,
+            "faces": {
+                "face1": 5,
+                "face2": 6,
+                "face3": 7,
+                "face4": 8
+            }
+        }
+    }
+}
+```
+### description
+We add the sidome to our own database
+### Resp
+201 CREATED
+same json as the entry
+
+# Ressource Sidome (avatar)
+## PUT /sidomes/<nobadge>
+```
+Content-type: application/json
+Accept: application/json
+```
+### request payload
+a sidome representation
+### description
+We update the sidome in our database
