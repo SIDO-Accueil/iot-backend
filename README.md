@@ -151,7 +151,7 @@ We update the sidome in our database
 
 ## GET /sidomes/id
 ### description
-We update the sidome in our database
+Get a specific sidome
 ### Resp
 200 OK
 
@@ -164,6 +164,15 @@ OR
 OR
 
 500 SERVER
+
+
+## PUT /sidomes
+### description
+We update the sidome in our database
+### Resp
+200 OK
+OR
+404 NOT FOUND
 
 # USE CASE
 ## Get information from the SIdO organisers API
@@ -254,3 +263,11 @@ POST /sidomes
 OR
 
 409 Conflict
+
+## PUT /sidomes
+### description
+We update the sidome in our database
+### Resp
+200 OK
+OR
+404 NOT FOUND

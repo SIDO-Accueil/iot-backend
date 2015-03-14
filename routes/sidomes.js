@@ -28,7 +28,6 @@ client.cluster.health()
     });
 
 
-/* GET sidomes listing. */
 router.get("/", function(req, res) {
     client.search({
         "index": "sidomes",
@@ -52,7 +51,6 @@ router.get("/", function(req, res) {
     });
 });
 
-/* GET a specific sidome . */
 router.get("/:id", function(req, res) {
     client.search({
         "index": "sidomes",
@@ -75,7 +73,46 @@ router.get("/:id", function(req, res) {
     });
 });
 
-/* Create a new person with a default sidome */
+router.put("/", function(req, res) {
+    var newSidome = req.body;
+
+    client.search({
+        "index": "sidomes",
+        "q": newSidome.id
+    }).then(function (body) {
+
+        if (body.hits.total > 1) {
+            // multiples results matchs
+            // error 500
+            res.status(500);
+        } else if (body.hits.total === 0) {
+            // 404
+            res.status(404);
+        } else {
+
+            // the existing sidome has been found
+            // let's update it
+            client.index({
+                index: "sidomes",
+                type: "sidomes",
+                id: newSidome.id,
+                body: newSidome
+            }).then(function() {
+                res.status(200);
+                res.send();
+            }, function (error) {
+                console.trace(error.message);
+                res.send(error.message);
+            });
+        }
+    }, function (error) {
+        console.trace(error.message);
+        res.send(error.message);
+    });
+
+});
+
+
 router.post("/fill", function(req, res) {
     var MAXUSER = 10000;
 
@@ -120,9 +157,7 @@ router.post("/fill", function(req, res) {
 
 });
 
-// POST /sidomes (ajout du sidome dans notre base)
 router.post("/", function(req, res) {
-    // get the json in the request payload
     var p = req.body;
 
     client.index({
