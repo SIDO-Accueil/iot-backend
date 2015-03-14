@@ -44,6 +44,30 @@ router.get("/", function(req, res) {
     });
 });
 
+/* GET one persons. */
+router.get("/:id", function(req, res) {
+    client.search({
+        index: "persons",
+        q: req.params.id
+    }).then(function (body) {
+
+        // get all matchings persons
+        var hits = body.hits.hits;
+
+        //noinspection Eslint
+        if (hits.length !== 1 || !hits[0]._source) {
+            res.status(500).end();
+        }
+
+        //noinspection Eslint
+        res.send(hits[0]._source);
+
+    }, function (error) {
+        console.trace(error.message);
+        res.send(error.message);
+    });
+});
+
 /* Create a new person with a default sidome */
 router.post("/fill", function(req, res, next) {
     var MAXUSER = 1000;
