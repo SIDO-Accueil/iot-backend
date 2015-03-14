@@ -52,6 +52,29 @@ router.get("/", function(req, res) {
     });
 });
 
+/* GET a specific sidome . */
+router.get("/:id", function(req, res) {
+    client.search({
+        "index": "sidomes",
+        "q": req.params.id
+    }).then(function (body) {
+
+        if (body.hits.total > 1) {
+            // error 500
+            res.status(500);
+        } else if (body.hits.total === 0) {
+            // 404
+            res.status(404);
+        } else {
+            //noinspection Eslint
+            res.send(body.hits.hits[0]._source);
+        }
+    }, function (error) {
+        console.trace(error.message);
+        res.send(error.message);
+    });
+});
+
 /* Create a new person with a default sidome */
 router.post("/fill", function(req, res) {
     var MAXUSER = 10000;

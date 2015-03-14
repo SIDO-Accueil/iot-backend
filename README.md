@@ -139,7 +139,7 @@ OR
 409 Conflict
 
 # Ressource Sidome (avatar)
-## PUT /sidomes/<nobadge>
+## PUT /sidomes/id
 ```
 Content-type: application/json
 Accept: application/json
@@ -148,6 +148,22 @@ Accept: application/json
 a sidome representation
 ### description
 We update the sidome in our database
+
+## GET /sidomes/id
+### description
+We update the sidome in our database
+### Resp
+200 OK
+
+and the sidome Json
+
+OR
+
+404 NOT FOUND
+
+OR
+
+500 SERVER
 
 # USE CASE
 ## Get information from the SIdO organisers API
