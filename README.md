@@ -141,6 +141,12 @@ We add the datas to our own database
     "email": ""
 }
 ```
+## POST /persons/fill (DEV ONLY)
+```
+Accept: application/json
+```
+### description
+We some random persons in our database
 
 # Ressource Sidome (avatar)
 ## POST /sidomes/<nobadge>
@@ -246,3 +252,10 @@ Accept: application/json
 a sidome representation
 ### description
 We update the sidome in our database
+## POST /sidomes/fill (DEV ONLY)
+```
+Accept: application/json
+```
+### description
+We some random sidomes in our database
+

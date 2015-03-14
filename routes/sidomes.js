@@ -53,7 +53,7 @@ router.get("/", function(req, res) {
 });
 
 /* Create a new person with a default sidome */
-router.post("/", function(req, res) {
+router.post("/fill", function(req, res) {
     var MAXUSER = 10000;
 
     var allPromises = [];

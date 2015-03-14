@@ -1,5 +1,4 @@
 /*eslint-env node*/
-/*global __dirname:false*/
 
 function initJSON(badge) {
     "use strict";

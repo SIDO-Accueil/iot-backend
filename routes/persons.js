@@ -4,6 +4,7 @@
 
 var express = require("express");
 var elasticsearch = require("elasticsearch");
+var personmodel = require("../util/person-model");
 
 //noinspection Eslint
 var router = express.Router();
@@ -28,7 +29,7 @@ client.cluster.health()
 
 
 /* GET persons listing. */
-router.get("/", function(req, res, next) {
+router.get("/", function(req, res) {
     client.search({
         index: "persons",
         q: "*"
@@ -44,27 +45,48 @@ router.get("/", function(req, res, next) {
 });
 
 /* Create a new person with a default sidome */
-router.post("/", function(req, res, next) {
-    var pers = {
-        "_id": 1,
-        "name": "John Doe",
-        "twitter": {
-            "twitterId": "@devnull",
-            "lastTweet": 1425511145 // timestamp of the last tweet with #sido
-        },
-        "badge": 1234
-    };
+router.post("/fill", function(req, res, next) {
+    var MAXUSER = 1000;
 
-    // index the person to elasticsearch
-    client.index({
-        index: "persons",
-        type: "personAndAvatar",
-        id: 1,
-        body: pers
-    }).then(function(resp) {
-        res.setHeader("Location", "localhost:3000/persons/1");
-        res.send(resp);
+    var allPromises = [];
+
+    for (var i = 1; i < MAXUSER; ++i) {
+        var s = personmodel.initJSON(i);
+
+        // index the sidome to elasticsearch
+        allPromises.push(client.index({
+            index: "persons",
+            type: "persons",
+            id: i,
+            body: s
+        }));
+    }
+
+    Promise.all(allPromises).then(function() {
+        console.log("all datas inserted");
+
+        client.search({
+            "index": "persons",
+            "size": 1000,
+            "q": "*"
+        }).then(function (body) {
+
+            // get all matchings persons
+            var hits = body.hits.hits;
+            var ans = [];
+
+            hits.forEach(function(j){
+                //noinspection Eslint
+                ans.push(j._source);
+            });
+
+            res.send(ans);
+        }, function (error) {
+            console.trace(error.message);
+            res.send(error.message);
+        });
     });
+
 });
 
 
