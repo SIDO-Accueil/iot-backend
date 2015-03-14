@@ -28,7 +28,7 @@ client.cluster.health()
     });
 
 
-/* GET persons listing. */
+/* GET sidomes listing. */
 router.get("/", function(req, res) {
     client.search({
         "index": "sidomes",
@@ -42,7 +42,7 @@ router.get("/", function(req, res) {
 
         hits.forEach(function(j){
             //noinspection Eslint
-            ans.push(j._source.sidome);
+            ans.push(j._source);
         });
 
         res.send(ans);
