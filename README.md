@@ -119,40 +119,56 @@ Accept: application/json
 ### request payload
 ```json
 {
-    "id": id,
-    "person": "<Person IRI>",
-    "default": true,
-    "visible": true,
-    "color": {
-        "r": 255,
-        "g": 255,
-        "b": 255
+  "default":true,
+  "visible":true,
+  "id":"q1w2e3r4t5y",
+  "color":{
+    "r":255,
+    "g":255,
+    "b":255
+  },
+  "nodes":{
+    "node1":{
+      "x":-0.87,
+      "y":-0.87,
+      "z":0.87
     },
-    "nodes": {
-        "node1": {
-            "x": -1,
-            "y": 0,
-            "z": 0,
-            "faces": {
-                "face1": 1,
-                "face2": 4,
-                "face3": 7,
-                "face4": 8
-            }
-        },
-        "node2": {
-            "x": 0,
-            "y": 0,
-            "z": 1,
-            "faces": {
-                "face1": 1,
-                "face2": 2,
-                "face3": 5,
-                "face4": 7
-            }
-        },
-        ...
+    "node2":{
+      "x":1.69,
+      "y":-1.69,
+      "z":1.69
+    },
+    "node3":{
+      "x":1.25,
+      "y":1.25,
+      "z":1.25
+    },
+    "node4":{
+      "x":-1.25,
+      "y":1.25,
+      "z":1.25
+    },
+    "node5":{
+      "x":0.77,
+      "y":-0.77,
+      "z":-0.77
+    },
+    "node6":{
+      "x":-1.63,
+      "y":-1.63,
+      "z":-1.63
+    },
+    "node7":{
+      "x":-1.63,
+      "y":1.63,
+      "z":-1.63
+    },
+    "node8":{
+      "x":0.69,
+      "y":0.69,
+      "z":-0.69
     }
+  }
 }
 ```
 ### description
@@ -221,12 +237,12 @@ POST /persons
 
 ```json
 {
-"id": "4243",
-"civilite": "M.",
-"nom": "Doe",
-"prenom": "John",
-"twitter": "@johndoe",
-"email": "john@doe.me"
+    "id": "4243",
+    "civilite": "M.",
+    "nom": "Doe",
+    "prenom": "John",
+    "twitter": "@johndoe",
+    "email": "john@doe.me"
 }
 ```
 ### RESP
@@ -244,44 +260,6 @@ OR
 ### REQ
 ```HTTP
 POST /sidomes
-```
-```json
-{
-    "id": id,
-    "person": "<Person IRI>",
-    "default": true,
-    "visible": true,
-    "color": {
-        "r": 255,
-        "g": 255,
-        "b": 255
-    },
-    "nodes": {
-        "node1": {
-            "x": -1,
-            "y": 0,
-            "z": 0,
-            "faces": {
-                "face1": 1,
-                "face2": 4,
-                "face3": 7,
-                "face4": 8
-            }
-        },
-        "node2": {
-            "x": 0,
-            "y": 0,
-            "z": 1,
-            "faces": {
-                "face1": 1,
-                "face2": 2,
-                "face3": 5,
-                "face4": 7
-            }
-        },
-        ...
-    }
-}
 ```
 ### RESP
 201 CREATED
