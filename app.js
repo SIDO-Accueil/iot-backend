@@ -9,9 +9,7 @@ var bodyParser = require("body-parser");
 var routes = require("./routes/index");
 var persons = require("./routes/persons");
 var sidomes = require("./routes/sidomes");
-var sidomes = require("./routes/tweets");
 var app = express();
-
 
 // CORS enable
 app.use(function(req, res, next) {
