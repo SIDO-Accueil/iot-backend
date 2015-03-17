@@ -23,8 +23,34 @@ bin/elasticsearch -f -Des.node.name=Node-2
 ```
 
 ## launch the Node.js server:
+
+To be able to connect to the twitter REST API, we need to set some environments variables.
+
+```
+Consumer Key (API Key),
+Consumer Secret (API Secret),
+Access Token,
+Access Token Secret,
+```
+are required.
+
+Once you have get theses keys, just export them
+```bash
+export TWITTER_CONSUMER_KEY="Your Consumer Key (API Key)"
+export TWITTER_CONSUMER_SECRET="Your Consumer Secret (API Secret)"
+export TWITTER_ACCESS_TOKEN_KEY="Your Access Token"
+export TWITTER_ACCESS_TOKEN_SECRET="Your Access Token Secret"
+```
+And start the Node.js server:
 ```bash
 node bin/www
+```
+
+Or in fishshell:
+```
+env TWITTER_CONSUMER_KEY="Your Consumer Key (API Key)" TWITTER_CONSUMER_SECRET="Your Consumer Secret (API Secret)" \
+    TWITTER_ACCESS_TOKEN_KEY="Your Access Token" TWITTER_ACCESS_TOKEN_SECRET="Your Access Token Secret"\
+    node routes/tweets.js
 ```
 
 The server connects to the elasticsearch master node, and do a quick check.

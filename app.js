@@ -9,6 +9,7 @@ var bodyParser = require("body-parser");
 var routes = require("./routes/index");
 var persons = require("./routes/persons");
 var sidomes = require("./routes/sidomes");
+var sidomes = require("./routes/tweets");
 var app = express();
 
 
@@ -39,7 +40,7 @@ app.use(function(req, res, next) {
 });
 
 // DEVELOPEMENT MODE
-app.set("env", "development");
+app.set("env", "production");
 
 // json pretty print (TODO remove me in production)
 if (app.get("env") === "development") {
