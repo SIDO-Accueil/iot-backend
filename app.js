@@ -5,6 +5,7 @@ var express = require("express");
 var path = require("path");
 var logger = require("morgan");
 var bodyParser = require("body-parser");
+var fs = require('fs');
 
 var routes = require("./routes/index");
 var persons = require("./routes/persons");
@@ -27,9 +28,16 @@ app.use(function(req, res, next) {
     next();
 });
 
-//app.use(logger("dev"));
+// LOGS
+// create a write stream (in append mode)
+var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
+app.use(logger("common", {stream: accessLogStream}));
+
+// PARSERS
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+// STATIC CONTENTS
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", routes);

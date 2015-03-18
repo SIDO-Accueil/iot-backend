@@ -38,7 +38,7 @@ elasticClient.cluster.health()
 var getStreams = function () {
     console.log("getstream ok");
 
-    client.stream("statuses/filter", {track: "#apple"}, function (stream) {
+    client.stream("statuses/filter", {track: "#iot"}, function (stream) {
         stream.on("data", function (tweet) {
             console.log("new tweet:" + tweet.created_at + ", lang: " + tweet.lang);
 
