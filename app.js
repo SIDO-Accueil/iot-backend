@@ -9,7 +9,14 @@ var bodyParser = require("body-parser");
 var routes = require("./routes/index");
 var persons = require("./routes/persons");
 var sidomes = require("./routes/sidomes");
+var tweets = require("./routes/tweets");
 var app = express();
+
+// Twitter stream to the ElasticSearch database
+var tweetstream = require("./util/tweetstream.js");
+
+// get the stream of tweets on the database
+tweetstream.getStreams();
 
 // CORS enable
 app.use(function(req, res, next) {
@@ -20,7 +27,7 @@ app.use(function(req, res, next) {
     next();
 });
 
-app.use(logger("dev"));
+//app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
@@ -28,6 +35,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", routes);
 app.use("/persons", persons);
 app.use("/sidomes", sidomes);
+app.use("/tweets", tweets);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

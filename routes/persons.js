@@ -18,7 +18,7 @@ var client = new elasticsearch.Client({
 client.cluster.health()
     .then(function(resp) {
         if (resp.status !== "green") {
-            console.trace("Please check unassigned_shards, check if two elasticsearch nodes are running");
+            console.log("Please check unassigned_shards");
         } else {
             console.log("ElasticSearch: OK");
         }

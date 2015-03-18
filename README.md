@@ -50,7 +50,7 @@ Or in fishshell:
 ```
 env TWITTER_CONSUMER_KEY="Your Consumer Key (API Key)" TWITTER_CONSUMER_SECRET="Your Consumer Secret (API Secret)" \
     TWITTER_ACCESS_TOKEN_KEY="Your Access Token" TWITTER_ACCESS_TOKEN_SECRET="Your Access Token Secret"\
-    node routes/tweets.js
+    node bin/www
 ```
 
 The server connects to the elasticsearch master node, and do a quick check.
