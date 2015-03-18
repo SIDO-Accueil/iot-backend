@@ -12,14 +12,9 @@ npm install
 [Download]{http://www.elasticsearch.org/download} and unzip/untar the Elasticsearch official distribution.
 
 ### lauch the elasticsearch master node
-("-f" is for specifing we want logs redirects to the STDOUT)
 
 ```bash
-bin/elasticsearch -f
-```
-launch a second node (to ensure to have replicas of datas)
-```bash
-bin/elasticsearch -f -Des.node.name=Node-2
+bin/elasticsearch
 ```
 
 ## launch the Node.js server:
