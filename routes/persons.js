@@ -47,7 +47,8 @@ router.get("/", function(req, res) {
         res.send(ans);
     }, function (error) {
         console.trace(error.message);
-        res.send(error.message);
+        res.status(500);
+        res.send({});
     });
 });
 
@@ -107,7 +108,8 @@ router.post("/fill", function(req, res) {
             res.send(ans);
         }, function (error) {
             console.trace(error.message);
-            res.send(error.message);
+            res.status(500);
+            res.send({});
         });
     });
 });

@@ -47,7 +47,8 @@ router.get("/", function(req, res) {
         res.send(ans);
     }, function (error) {
         console.trace(error.message);
-        res.send(error.message);
+        res.status(500);
+        res.send({});
     });
 });
 
@@ -60,18 +61,19 @@ router.get("/:id", function(req, res) {
         if (body.hits.total > 1) {
             // error 500
             res.status(500);
-            res.send();
+            res.send({});
         } else if (body.hits.total === 0) {
             // 404
             res.status(404);
-            res.send();
+            res.send({});
         } else {
             //noinspection Eslint
             res.send(body.hits.hits[0]._source);
         }
     }, function (error) {
         console.trace(error.message);
-        res.send(error.message);
+        res.status(500);
+        res.send({});
     });
 });
 
@@ -87,12 +89,12 @@ router.put("/", function(req, res) {
             // multiples results matchs
             // error 500
             res.status(500);
-            res.send();
+            res.send({});
 
         } else if (body.hits.total === 0) {
             // 404
             res.status(404);
-            res.send();
+            res.send({});
         } else {
 
             // the existing sidome has been found
@@ -107,12 +109,14 @@ router.put("/", function(req, res) {
                 res.send();
             }, function (error) {
                 console.trace(error.message);
-                res.send(error.message);
+                res.status(500);
+                res.send({});
             });
         }
     }, function (error) {
         console.trace(error.message);
-        res.send(error.message);
+        res.status(500);
+        res.send({});
     });
 
 });
@@ -156,7 +160,8 @@ router.post("/fill", function(req, res) {
             res.send(ans);
         }, function (error) {
             console.trace(error.message);
-            res.send(error.message);
+            res.status(500);
+            res.send({});
         });
     });
 
