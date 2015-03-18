@@ -5,6 +5,7 @@
 var express = require("express");
 var elasticsearch = require("elasticsearch");
 var sidomemodel = require("../util/sidome-model");
+var moment = require("moment");
 
 //noinspection Eslint
 var router = express.Router();
@@ -99,6 +100,10 @@ router.put("/", function(req, res) {
 
             // the existing sidome has been found
             // let's update it
+
+            var now = moment();
+            newSidome.lastModified = now.unix();
+
             client.index({
                 index: "sidomes",
                 type: "sidomes",
@@ -169,6 +174,9 @@ router.post("/fill", function(req, res) {
 
 router.post("/", function(req, res) {
     var p = req.body;
+
+    var now = moment();
+    p.lastModified = now.unix();
 
     client.index({
         index: "sidomes",
