@@ -56,7 +56,13 @@ router.get("/", function(req, res) {
 router.get("/:id", function(req, res) {
     client.search({
         "index": "sidomes",
-        "q": req.params.id
+        body: {
+            query: {
+                match: {
+                    _id: req.params.id
+                }
+            }
+        }
     }).then(function (body) {
 
         if (body.hits.total > 1) {
@@ -126,52 +132,6 @@ router.put("/", function(req, res) {
 
 });
 
-
-router.post("/fill", function(req, res) {
-    var MAXUSER = 10000;
-
-    var allPromises = [];
-
-    for (var i = 1; i < MAXUSER; ++i) {
-        var s = sidomemodel.initJSON(i);
-
-        // index the sidome to elasticsearch
-        allPromises.push(client.index({
-            index: "sidomes",
-            type: "sidomes",
-            id: i,
-            body: s
-        }));
-    }
-
-    Promise.all(allPromises).then(function() {
-        console.log("all datas inserted");
-
-        client.search({
-            "index": "sidomes",
-            "size": 10000,
-            "q": "*"
-        }).then(function (body) {
-
-            // get all matchings persons
-            var hits = body.hits.hits;
-            var ans = [];
-
-            hits.forEach(function(j){
-                //noinspection Eslint
-                ans.push(j._source.sidome);
-            });
-
-            res.send(ans);
-        }, function (error) {
-            console.trace(error.message);
-            res.status(500);
-            res.send({});
-        });
-    });
-
-});
-
 router.post("/", function(req, res) {
     var p = req.body;
 
@@ -185,8 +145,13 @@ router.post("/", function(req, res) {
         body: p
     }).then(function(d) {
         if (!d.created) {
-            res.status(409);
-            res.send({"created": d.created});
+            client.search({
+                "index": "sidomes",
+                "q": p.id
+            }).then(function (body) {
+                res.status(409);
+                res.send(body.hits.hits[0]._source);
+            });
         } else {
             res.status(201);
             res.send({"created": d.created});

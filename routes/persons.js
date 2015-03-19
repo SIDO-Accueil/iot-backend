@@ -69,51 +69,6 @@ router.get("/:id", function(req, res) {
     res.send(p);
 });
 
-/* Create new randoms persons */
-router.post("/fill", function(req, res) {
-    var MAXUSER = 1000;
-
-    var allPromises = [];
-
-    for (var i = 1; i < MAXUSER; ++i) {
-        var s = personmodel.initJSON(i);
-
-        // index the sidome to elasticsearch
-        allPromises.push(client.index({
-            index: "persons",
-            type: "persons",
-            id: i,
-            body: s
-        }));
-    }
-
-    Promise.all(allPromises).then(function() {
-        console.log("all datas inserted");
-
-        client.search({
-            "index": "persons",
-            "size": 1000,
-            "q": "*"
-        }).then(function (body) {
-
-            // get all matchings persons
-            var hits = body.hits.hits;
-            var ans = [];
-
-            hits.forEach(function(j){
-                //noinspection Eslint
-                ans.push(j._source);
-            });
-
-            res.send(ans);
-        }, function (error) {
-            console.trace(error.message);
-            res.status(500);
-            res.send({});
-        });
-    });
-});
-
 /* Create new Person */
 router.post("/", function(req, res) {
 
@@ -129,7 +84,7 @@ router.post("/", function(req, res) {
         body: p
     }).then(function(d) {
         if (!d.created) {
-            res.status(400);
+            res.status(409);
             res.send({"created": d.created});
         } else {
             res.status(201);
