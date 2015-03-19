@@ -1,34 +1,26 @@
 # iot-backend
-Just a small backend using Node.js &amp; ElasticSearch to handle persons representation and their avatar
-
+Just a small backend using Node.js &amp; ElasticSearch to handle persons representation, their avatars, and tweets about a specific event on the topic of Web of Things.
 ## install:
 ```bash
 npm install
 ```
-
 ## Elasticsearch
-
 ### get Elasticsearch
 [Download]{http://www.elasticsearch.org/download} and unzip/untar the Elasticsearch official distribution.
-
 ### lauch the elasticsearch master node
-
 ```bash
 bin/elasticsearch
 ```
-
-## launch the Node.js server:
-
+## Launch the Node.js server:
 To be able to connect to the twitter REST API, we need to set some environments variables.
-
 ```
 Consumer Key (API Key),
 Consumer Secret (API Secret),
 Access Token,
 Access Token Secret,
 ```
-are required.
-
+are **required**.
+Get theses key [here]{https://apps.twitter.com/}.
 Once you have get theses keys, just export them
 ```bash
 export TWITTER_CONSUMER_KEY="Your Consumer Key (API Key)"
@@ -52,15 +44,14 @@ The server connects to the elasticsearch master node, and do a quick check.
 if everything goes fine, you should read be able to read "ElasticSearch: OK" in the STDOUT, if not check your elasticsearch logs
 
 # API
-
 # Ressource Person
 ## GET /persons/id
-### description
+### Description
 We do a GET on the REST API provided by SIdO organizers, and return it
-### Resp
+### Response
 ```json
 {
-    "id": 424242,
+    "id": "42q4dd2a42",
     "civilite": "M.",
     "nom": "Doe",
     "prenom": "John",
@@ -68,15 +59,9 @@ We do a GET on the REST API provided by SIdO organizers, and return it
     "email": "john@doe.me"
 }
 ```
-OR if the Person is not in the database:
-```
-HTTP return code 404
-```
-```json
-{}
-```
-
 ## POST /persons
+### description
+We add the person entity to our own database
 ```
 Content-type: application/json
 Accept: application/json
@@ -84,138 +69,161 @@ Accept: application/json
 ### request payload
 ```json
 {
-    "id": id,
-    "civilite": "",
-    "nom": "",
-    "prenom": "",
-    "twitter": "",
-    "email": ""
+    "id": "42q4dd2a42",
+    "civilite": "M.",
+    "nom": "Doe",
+    "prenom": "John",
+    "twitter": "@johndoe",
+    "email": "john@doe.me"
 }
 ```
-### description
-We add the datas to our own database
-### RESP
+### Response
+```
 201 CREATED
+```
 ```json
 {"created": true}
 ```
-OR
+OR if the person already exists in our database:
+```
 409 Conflict
+```
 ```json
 {"created": false}
 ```
 
 # Ressource Sidome (avatar)
 ## POST /sidomes
-```
-Content-type: application/json
-Accept: application/json
-```
+### description
+We add the sidome to our own database
 ### request payload
 ```json
 {
-  "default":true,
-  "visible":true,
-  "id":"q1w2e3r4t5y",
-  "color":{
-    "r":255,
-    "g":255,
-    "b":255
-  },
-  "nodes":{
-    "node1":{
-      "x":-0.87,
-      "y":-0.87,
-      "z":0.87
+    "default": true,
+    "visible": true,
+    "id": "1842c57a991e",
+    "color": {
+        "r": 255,
+        "g": 255,
+        "b": 255
     },
-    "node2":{
-      "x":1.69,
-      "y":-1.69,
-      "z":1.69
+    "nodes": {
+        "node1": {
+            "x": -1.25,
+            "y": -1.25,
+            "z": 1.25
+        },
+        "node2": {
+            "x": 1.25,
+            "y": -1.25,
+            "z": 1.25
+        },
+        "node3": {
+            "x": 1.25,
+            "y": 1.25,
+            "z": 1.25
+        },
+        "node4": {
+            "x": -1.73,
+            "y": 1.73,
+            "z": 1.73
+        },
+        "node5": {
+            "x": 1.25,
+            "y": -1.25,
+            "z": -1.25
+        },
+        "node6": {
+            "x": -1.61,
+            "y": -1.61,
+            "z": -1.61
+        },
+        "node7": {
+            "x": -1.25,
+            "y": 1.25,
+            "z": -1.25
+        },
+        "node8": {
+            "x": 1.25,
+            "y": 1.25,
+            "z": -1.25
+        }
     },
-    "node3":{
-      "x":1.25,
-      "y":1.25,
-      "z":1.25
-    },
-    "node4":{
-      "x":-1.25,
-      "y":1.25,
-      "z":1.25
-    },
-    "node5":{
-      "x":0.77,
-      "y":-0.77,
-      "z":-0.77
-    },
-    "node6":{
-      "x":-1.63,
-      "y":-1.63,
-      "z":-1.63
-    },
-    "node7":{
-      "x":-1.63,
-      "y":1.63,
-      "z":-1.63
-    },
-    "node8":{
-      "x":0.69,
-      "y":0.69,
-      "z":-0.69
-    }
-  }
+    "lastModified": 1426688386
 }
 ```
-### description
-We add the sidome to our own database
-### Resp
+### Response
+```
 201 CREATED
-
+```
 OR
-
+```
 409 Conflict
-
-# Ressource Sidome (avatar)
-## PUT /sidomes/id
 ```
-Content-type: application/json
-Accept: application/json
-```
+## PUT /sidomes
 ### request payload
-a sidome representation
+An updated sidome representation
 ### description
 We update the sidome in our database
-
 ## GET /sidomes/id
 ### description
 Get a specific sidome
 ### Resp
-200 OK
+a sidome Json
 
-and the sidome Json
-
-OR
-
-404 NOT FOUND
-
-OR
-
-500 SERVER
-
-
-## PUT /sidomes
+# Ressource Tweet
+## GET /tweets
+### Description
+Getting all tweets about the event
+### Response
+```json
+[
+    {
+        "usr": "doug42",
+        "name": "Douglas A",
+        "txt": "@toto , WHoo this event is so awesome: come on to the #SIdO event ! #IOT",
+        "hashtags":
+        [
+            {
+                "text": "IOT",
+                "indices": [125, 129]
+            },
+            {
+                "text": "SIdO",
+                "indices": [130, 140]
+            }
+        ],
+        "mentions":
+        [
+            {
+                "screen_name": "toto",
+                "name": "Dylan Thomas",
+                "id": 461424242,
+                "id_str": "654654564",
+                "indices": [3, 11]
+            }
+        ]
+    },
+    ...
+]
+```
+# Ressource Image
+## POST /image/id
+id is the id of the Person
 ### description
-We update the sidome in our database
-### Resp
-200 OK
-OR
-404 NOT FOUND
+Posting an image representation of the sidome to allow the user to receives it by email
+### request payload
+```
+"data:image/png;base64,iVBORw0KG..............."
+```
 
 # USE CASE
 ## Get information from the SIdO organisers API
-### REQ
+### Request
+```
 GET /persons/id
-### RESP
+```
+### Responses
 ```json
 {
     "id": "4243",
@@ -227,9 +235,8 @@ GET /persons/id
 }
 ```
 ## POST theses informations to this backend
-### REQ
+### Request
 POST /persons
-
 ```json
 {
     "id": "4243",
@@ -240,33 +247,12 @@ POST /persons
     "email": "john@doe.me"
 }
 ```
-### RESP
-201 CREATED
-```json
-{"created": true}
-```
-OR
-409 Conflict
-```json
-{"created": false}
-```
-
 ## POST a new default sidome to this backend
-### REQ
+### Request
 ```HTTP
 POST /sidomes
 ```
-### RESP
-201 CREATED
-
-OR
-
-409 Conflict
-
-## PUT /sidomes
-### description
-We update the sidome in our database
-### Resp
-200 OK
-OR
-404 NOT FOUND
+## Update the sidome
+```HTTP
+PUT /sidomes
+```
