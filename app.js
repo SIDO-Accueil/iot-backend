@@ -11,6 +11,8 @@ var routes = require("./routes/index");
 var persons = require("./routes/persons");
 var sidomes = require("./routes/sidomes");
 var tweets = require("./routes/tweets");
+var image = require("./routes/image");
+
 var app = express();
 
 // Twitter stream to the ElasticSearch database
@@ -44,6 +46,7 @@ app.use("/", routes);
 app.use("/persons", persons);
 app.use("/sidomes", sidomes);
 app.use("/tweets", tweets);
+app.use("/image", image);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

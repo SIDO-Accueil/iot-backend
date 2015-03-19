@@ -131,9 +131,10 @@ router.post("/", function(req, res) {
         if (!d.created) {
             res.status(400);
             res.send({"created": d.created});
+        } else {
+            res.status(201);
+            res.send({"created": d.created});
         }
-        res.status(201);
-        res.send({"created": d.created});
     });
 });
 
