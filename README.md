@@ -6,7 +6,7 @@ npm install
 ```
 ## Elasticsearch
 ### get Elasticsearch
-[Download]{http://www.elasticsearch.org/download} and unzip/untar the Elasticsearch official distribution.
+[Download](http://www.elasticsearch.org/download}) and unzip/untar the Elasticsearch official distribution.
 ### lauch the elasticsearch master node
 ```bash
 bin/elasticsearch
@@ -20,7 +20,7 @@ Access Token,
 Access Token Secret,
 ```
 are **required**.
-Get theses key [here]{https://apps.twitter.com/}.
+Get theses key [here](https://apps.twitter.com/).
 Once you have get theses keys, just export them
 ```bash
 export TWITTER_CONSUMER_KEY="Your Consumer Key (API Key)"
