@@ -20,7 +20,12 @@ var app = express();
 var tweetstream = require("./util/tweetstream.js");
 
 // get the stream of tweets on the database
-tweetstream.getStreams();
+var hashtags = [
+    "iot", "sido", "objetsconnectes", "sidoevent", "gmc", "innovationdating"
+    //"javascript", "angularjs", "backbone", "scala", "browserify", "iojs", "java", "apple"
+];
+var lang = "en";
+tweetstream.getStreams(hashtags, lang);
 
 // CORS enable
 app.use(function(req, res, next) {

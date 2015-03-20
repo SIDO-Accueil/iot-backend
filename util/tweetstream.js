@@ -35,10 +35,14 @@ elasticClient.cluster.health()
         console.trace(error.message);
     });
 
-var getStreams = function () {
+var getStreams = function (hashtagslist, lang) {
     console.log("getstream ok");
 
-    client.stream("statuses/filter", {track: "#iot"}, function (stream) {
+    var hts = hashtagslist.reduce(function(e,a){return e+","+a;});
+
+    client.stream("statuses/filter",
+        {track: hts, language: lang}, function (stream) {
+
         stream.on("data", function (tweet) {
             console.log("new tweet:" + tweet.created_at + ", lang: " + tweet.lang);
 
