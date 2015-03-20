@@ -27,30 +27,43 @@ client.cluster.health()
     });
 
 
-/* GET tweets listing. */
-router.get("/", function(req, res) {
-    client.search({
+// returns a promise
+var fillStats = function(hashtag) {
+    return client.search({
         "query": {
             "bool": {
                 "must": [
                     {
                         "wildcard": {
-                            "tweets.hashtags": "iot"
+                            "tweets.hashtags": hashtag
                         }
                     }
                 ]
             }
         }
-    }).then(function (body) {
+    })
+};
 
-        var total = body.hits.total;
-        res.send({
-            "iot": total
-        });
-    }, function (error) {
-        console.trace(error.message);
-        res.status(500);
-        res.send({});
+/* GET tweets listing. */
+router.get("/", function(req, res) {
+
+    var output = {};
+    var promises = [];
+    var hashtags = [
+        //"javascript", "angularjs", "backbone", "scala", "browserify", "iojs", "java", "apple"
+        "iot", "sido", "objetsconnectes", "sidoevent", "gmc", "innovationdating"
+    ];
+
+    hashtags.forEach(function(ht) {
+        promises.push(fillStats(ht));
+    });
+
+    Promise.all(promises).then(function(results) {
+        for (var i = 0; i < promises.length; ++i) {
+            var total = results[i].hits.total;
+            output[hashtags[i]] = total;
+        }
+        res.send(output);
     });
 });
 
