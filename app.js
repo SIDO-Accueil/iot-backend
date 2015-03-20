@@ -12,6 +12,7 @@ var persons = require("./routes/persons");
 var sidomes = require("./routes/sidomes");
 var tweets = require("./routes/tweets");
 var image = require("./routes/image");
+var stats = require("./routes/stats");
 
 var app = express();
 
@@ -47,6 +48,7 @@ app.use("/persons", persons);
 app.use("/sidomes", sidomes);
 app.use("/tweets", tweets);
 app.use("/image", image);
+app.use("/stats", stats);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
