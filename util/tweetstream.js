@@ -42,6 +42,16 @@ var getStreams = function () {
         stream.on("data", function (tweet) {
             console.log("new tweet:" + tweet.created_at + ", lang: " + tweet.lang);
 
+            var hts = [];
+            tweet.entities.hashtags.forEach(function(e) {
+               hts.push(e.text);
+            });
+
+            var mentions = [];
+            tweet.entities.user_mentions.forEach(function(e) {
+                mentions.push(e.screen_name);
+            });
+
             if (tweet.lang === "en") {
                 elasticClient.index({
                     index: "twitter",
@@ -51,8 +61,8 @@ var getStreams = function () {
                         "usr": tweet.user.screen_name,
                         "name": tweet.user.name,
                         "txt": tweet.text,
-                        "hashtags": tweet.entities.hashtags,
-                        "mentions": tweet.entities.user_mentions
+                        "hashtags": hts,
+                        "mentions": mentions
                     }
                 });
             }
