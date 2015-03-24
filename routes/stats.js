@@ -3,6 +3,7 @@
 
 var express = require("express");
 var elasticsearch = require("elasticsearch");
+var rp = require('request-promise');
 
 //noinspection Eslint
 var router = express.Router();
@@ -29,19 +30,27 @@ client.cluster.health()
 
 // returns a promise
 var fillStats = function(hashtag) {
-    return client.search({
-        "query": {
-            "bool": {
-                "must": [
-                    {
-                        "wildcard": {
+    return rp.post({
+        uri: 'http://localhost:9200/_search',
+        method: 'POST',
+        json: {
+            "query": {
+                "bool": {
+                    "must":[{
+                        "term": {
                             "tweets.hashtags": hashtag
                         }
-                    }
-                ]
-            }
+                    }],
+                    "must_not": [],
+                    "should": []
+                }
+            },
+            "from": 0,
+            "size": 10,
+            "sort": [],
+            "facets": {}
         }
-    })
+    });
 };
 
 /* GET tweets listing. */
