@@ -47,7 +47,7 @@ if everything goes fine, you should read be able to read "ElasticSearch: OK" in 
 # Ressource Person
 ## GET /persons/id
 ### Description
-We do a GET on the REST API provided by SIdO organizers, and return it
+We do a GET on our own database.
 ### Response
 ```json
 {
@@ -56,10 +56,13 @@ We do a GET on the REST API provided by SIdO organizers, and return it
     "nom": "Doe",
     "prenom": "John",
     "twitter": "@johndoe",
-    "email": "john@doe.me"
+    "email": "john@doe.me",
+    "company": "Aperture Science"
 }
 ```
-## POST /persons
+OR 
+404 NOT FOUND, if the person not yet exist
+## POST /persons/id
 ### description
 We add the person entity to our own database
 ```
@@ -74,7 +77,8 @@ Accept: application/json
     "nom": "Doe",
     "prenom": "John",
     "twitter": "@johndoe",
-    "email": "john@doe.me"
+    "email": "john@doe.me",
+    "company": "Aperture Science"
 }
 ```
 ### Response
@@ -218,7 +222,7 @@ Posting an image representation of the sidome to allow the user to receives it b
 ```
 
 # USE CASE
-## Get information from the SIdO organisers API
+## Get person information
 ### Request
 ```
 GET /persons/id
@@ -231,10 +235,12 @@ GET /persons/id
     "nom": "Doe",
     "prenom": "John",
     "twitter": "@johndoe",
-    "email": "john@doe.me"
+    "email": "john@doe.me",
+    "company": "Aperture Science"
 }
 ```
 ## POST theses informations to this backend
+If GET /persons/id had returned 404, the client do a GET on the SIdO organizer REST API, and POST the data to our REST API.
 ### Request
 POST /persons
 ```json
@@ -244,7 +250,8 @@ POST /persons
     "nom": "Doe",
     "prenom": "John",
     "twitter": "@johndoe",
-    "email": "john@doe.me"
+    "email": "john@doe.me",
+    "company": "Aperture Science"
 }
 ```
 ## POST a new default sidome to this backend
