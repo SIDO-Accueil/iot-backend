@@ -83,7 +83,8 @@ router.get("/", function(req, res) {
             output[hashtags[i]] = total;
         }
         sidomesStats.then(function(sidomesStatsRes) {
-            output['visiteurs'] = sidomesStatsRes.hits.total;
+            output['sidomesPerso'] = sidomesStatsRes.hits.total;
+            output['sidomesTotal'] = sidomesStatsRes.hits.total + anonPersonCount;
             res.send(output);
         }).catch(function(err) {
             console.error(err);
