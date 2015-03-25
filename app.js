@@ -13,6 +13,7 @@ var sidomes = require("./routes/sidomes");
 var tweets = require("./routes/tweets");
 var image = require("./routes/image");
 var stats = require("./routes/stats");
+var anonPersons = require("./routes/anonPerson");
 
 var app = express();
 
@@ -54,6 +55,10 @@ app.use("/sidomes", sidomes);
 app.use("/tweets", tweets);
 app.use("/image", image);
 app.use("/stats", stats);
+app.use("/anonpersons", anonPersons);
+
+// global anonperson counter
+anonPersonCount = 0; //TODO UGLY global variable !!!
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
