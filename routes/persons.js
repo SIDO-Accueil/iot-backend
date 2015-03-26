@@ -60,7 +60,7 @@ router.get("/:id", function(req, res) {
         body: {
             query: {
                 match: {
-                    _id: req.params.id
+                    id: req.params.id
                 }
             }
         }
