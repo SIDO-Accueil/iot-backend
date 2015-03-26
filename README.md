@@ -28,6 +28,23 @@ export TWITTER_CONSUMER_SECRET="Your Consumer Secret (API Secret)"
 export TWITTER_ACCESS_TOKEN_KEY="Your Access Token"
 export TWITTER_ACCESS_TOKEN_SECRET="Your Access Token Secret"
 ```
+
+To be able to connect to the SQL database containing users phones statistics,
+we need to set some environments variables.
+```
+MYSQL_URL,
+MYSQL_USER,
+MYSQL_DATABASE,
+MYSQL_PASSWORD,
+```
+are **required**.
+```bash
+export MYSQL_URL="example.org"
+export MYSQL_USER="username"
+export MYSQL_DATABASE="mydatabasename"
+export MYSQL_PASSWORD="password"
+```
+
 And start the Node.js server:
 ```bash
 node bin/www
@@ -35,8 +52,10 @@ node bin/www
 
 Or in fishshell:
 ```
-env TWITTER_CONSUMER_KEY="Your Consumer Key (API Key)" TWITTER_CONSUMER_SECRET="Your Consumer Secret (API Secret)" \
+env TWITTER_CONSUMER_KEY="Your Consumer Key (API Key)" TWITTER_CONSUMER_SECRET="Your Consumer Secret (API Secret)"\
     TWITTER_ACCESS_TOKEN_KEY="Your Access Token" TWITTER_ACCESS_TOKEN_SECRET="Your Access Token Secret"\
+    MYSQL_URL="example.org" MYSQL_USER="username"\
+    MYSQL_DATABASE="mydatabasename" MYSQL_PASSWORD="password"\
     node bin/www
 ```
 
@@ -219,6 +238,26 @@ Posting an image representation of the sidome to allow the user to receives it b
 ### request payload
 ```
 "data:image/png;base64,iVBORw0KG..............."
+```
+
+# Ressource Stats
+## GET /stats
+### Response
+```json
+{
+    "iot": 624,
+    "sido": 0,
+    "objetsconnectes": 0,
+    "sidoevent": 0,
+    "gmc": 38,
+    "innovationdating": 0,
+    "sidomesPerso": 12,
+    "sidomesTotal": 12,
+    "ios": 25.64,
+    "win": 3.48,
+    "android": 17.54,
+    "other": 53.35
+}
 ```
 
 # USE CASE

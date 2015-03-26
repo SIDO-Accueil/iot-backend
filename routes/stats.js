@@ -4,6 +4,8 @@
 var express = require("express");
 var elasticsearch = require("elasticsearch");
 var rp = require('request-promise');
+var mysql = require('mysql');
+var Promise = require("bluebird");
 
 //noinspection Eslint
 var router = express.Router();
@@ -27,6 +29,18 @@ client.cluster.health()
         console.trace(error.message);
     });
 
+
+var mysqlQueryWrapper = function(connection, query, name) {
+    return new Promise(function (resolve, reject) {
+        connection.query(query, function(err, rows, fields) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows[0][name]);
+            };
+        });
+    });
+};
 
 // returns a promise
 var fillStatsTweets = function(hashtag) {
@@ -65,6 +79,46 @@ var fillStatsSidomes = function() {
 /* GET tweets listing. */
 router.get("/", function(req, res) {
 
+    // PHONES
+    var connection = mysql.createConnection({
+        host     : process.env.MYSQL_URL,  // TODO NEED TO DO SOME CHECKS
+        user     : process.env.MYSQL_USER,
+        database : process.env.MYSQL_DATABASE,
+        password : process.env.MYSQL_PASSWORD
+    });
+    connection.connect();
+    var queryIos =
+        'SELECT Round((count(manufacturer) / (SELECT count(manufacturer) ' +
+        'FROM sniffer WHERE seen_last_half_day = 1) * 100),2) AS "ios" ' +
+        'FROM sniffer WHERE manufacturer like "Apple%" ' +
+        'AND seen_last_half_day = 1;';
+    var queryWin =
+        'SELECT Round((count(manufacturer) / (SELECT count(manufacturer) ' +
+        'FROM sniffer WHERE seen_last_half_day = 1) * 100),2) AS "win"'+
+        'FROM sniffer WHERE (manufacturer LIKE "%Microsoft%" ' +
+        'OR manufacturer LIKE "%Nokia%") AND seen_last_half_day = 1;';
+    var queryAndroid =
+        'SELECT Round((count(manufacturer) / (SELECT count(manufacturer) ' +
+        'FROM sniffer WHERE seen_last_half_day = 1) * 100),2) AS "android"'+
+        'FROM sniffer WHERE (manufacturer LIKE "%Sony%" OR' +
+        ' manufacturer LIKE "%HUAWEI%" ' +
+        'OR manufacturer LIKE "%Samsung%" OR manufacturer LIKE "%LG%" OR ' +
+        'manufacturer LIKE "%HTC%") AND seen_last_half_day = 1;';
+    var queryOther =
+        'SELECT Round((count(manufacturer) / (SELECT count(manufacturer)' +
+        'FROM sniffer WHERE seen_last_half_day = 1) * 100),2) ' +
+        'AS "other" FROM sniffer' +
+        ' WHERE manufacturer NOT LIKE "%Apple%" ' +
+        'AND manufacturer NOT LIKE "%Nokia%" AND ' +
+        'manufacturer NOT LIKE "%Microsoft%" ' +
+        'AND manufacturer NOT LIKE "%Sony%" ' +
+        'AND manufacturer NOT LIKE "%HUAWEI%" ' +
+        'AND manufacturer NOT LIKE "%Samsung%" ' +
+        'AND manufacturer NOT LIKE "%LG%" ' +
+        'AND manufacturer NOT LIKE "%HTC%" AND seen_last_half_day = 1;';
+
+
+    // TWEETS
     var output = {};
     var promises = [];
     var hashtags = [
@@ -75,6 +129,7 @@ router.get("/", function(req, res) {
         promises.push(fillStatsTweets(ht));
     });
 
+    // SIDOMES
     var sidomesStats = fillStatsSidomes();
 
     Promise.all(promises).then(function(results) {
@@ -85,7 +140,27 @@ router.get("/", function(req, res) {
         sidomesStats.then(function(sidomesStatsRes) {
             output['sidomesPerso'] = sidomesStatsRes.hits.total;
             output['sidomesTotal'] = sidomesStatsRes.hits.total + anonPersonCount;
-            res.send(output);
+
+            Promise.props({
+                ios: mysqlQueryWrapper(connection, queryIos, 'ios'),
+                win: mysqlQueryWrapper(connection, queryWin, 'win'),
+                android: mysqlQueryWrapper(connection, queryAndroid, 'android'),
+                other: mysqlQueryWrapper(connection, queryOther, 'other')
+            }).then(function(phonesStats) {
+                console.log(phonesStats);
+                connection.end();
+
+                output['ios'] = phonesStats['ios'];
+                output['win'] = phonesStats['win'];
+                output['android'] = phonesStats['android'];
+                output['other'] = phonesStats['other'];
+                res.send(output);
+            }).catch(function(err) {
+                console.log(err);
+                res.status(500);
+                res.send(err);
+            });
+
         }).catch(function(err) {
             console.error(err);
             res.status(500);
