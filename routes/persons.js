@@ -55,32 +55,54 @@ router.get("/", function(req, res) {
 /* GET one persons from Dorian API*/
 router.get("/:id", function(req, res) {
 
-    // TODO DO THE HTTP GET on the Dorian API
-    // TODO RETURN 404 if not found
-    // TODO remove this mock:
-    var p = {
-        "id": req.params.id,
-        "civilite": "M.",
-        "nom": "Doe",
-        "prenom": "John",
-        "twitter": "@johndoe",
-        "email": "john@doe.me"
-    };
-    res.send(p);
+    client.search({
+        "index": "persons",
+        body: {
+            query: {
+                match: {
+                    _id: req.params.id
+                }
+            }
+        }
+    }).then(function (body) {
+
+        if (body.hits.total > 1) {
+            // error 500
+            res.status(500);
+            res.send({});
+        } else if (body.hits.total === 0) {
+            // 404
+            res.status(404);
+            res.send({});
+        } else {
+            //noinspection Eslint
+            res.send(body.hits.hits[0]._source);
+        }
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send({});
+    });
 });
 
 /* Create new Person */
-router.post("/", function(req, res) {
-
-    // console.log(req);
+router.post("/:id", function(req, res) {
 
     // get the json in the request payload
     var p = req.body;
 
+    var id;
+    if (!req.body.id) {
+        id = req.params.id;
+    } else if (req.body.id && req.body.id !== req.params.id) {
+        res.status(400);
+        res.send({"error": "ids dont matchs"});
+    }
+
     client.index({
         index: "persons",
         type: "persons",
-        id: p.id,
+        id: id,
         body: p
     }).then(function(d) {
         if (!d.created) {
