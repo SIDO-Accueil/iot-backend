@@ -178,10 +178,19 @@ router.get("/:id", function(req, res) {
     });
 });
 
+var fixSidomeColor = function (sidome) {
+    var color = sidome.color;
+    color.r = Math.round(color.r, 0);
+    color.g = Math.round(color.g, 0);
+    color.b = Math.round(color.g, 0);
+    return sidome;
+};
+
 var updateSidome = function(newSidome, res) {
     var now = moment();
     newSidome.lastModified = now.unix();
     newSidome.visible = false;
+    newSidome = fixSidomeColor(newSidome);
 
     client.search({
         "index": "sidomes",
@@ -251,6 +260,7 @@ var addSidome = function (sidome, res) {
     var now = moment();
     sidome.lastModified = now.unix();
     sidome.visible = false;
+    sidome = fixSidomeColor(sidome);
 
     client.index({
         index: "sidomes",
