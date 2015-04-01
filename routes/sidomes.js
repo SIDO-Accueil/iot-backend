@@ -4,8 +4,10 @@
 
 var express = require("express");
 var elasticsearch = require("elasticsearch");
-var sidomemodel = require("../util/sidome-model");
+var sidomeinoutmodel = require("../util/sidome-inout-model");
 var moment = require("moment");
+
+var sidomes = require("../util/sidome-inout-model");
 
 //noinspection Eslint
 var router = express.Router();
@@ -29,7 +31,7 @@ client.cluster.health()
     });
 
 
-router.get("/", function(req, res) {
+router.get("/all", function(req, res) {
     client.search({
         "index": "sidomes",
         "size": 10000,
@@ -51,6 +53,10 @@ router.get("/", function(req, res) {
         res.status(500);
         res.send({});
     });
+});
+
+router.get("/", function(req, res) {
+    res.send(sidomes.initJSON("abc1234", 2));
 });
 
 router.get("/:id", function(req, res) {
