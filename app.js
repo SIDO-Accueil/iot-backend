@@ -5,7 +5,7 @@ var express = require("express");
 var path = require("path");
 var logger = require("morgan");
 var bodyParser = require("body-parser");
-var fs = require('fs');
+var fs = require("fs");
 
 var routes = require("./routes/index");
 var persons = require("./routes/persons");
@@ -32,14 +32,17 @@ tweetstream.getStreams(hashtags, lang);
 app.use(function(req, res, next) {
     "use strict";
     res.header("Access-Control-Allow-Origin", "http://localhost:8080");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+    res.header("Access-Control-Allow-Headers",
+               "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
     next();
 });
 
 // LOGS
 // create a write stream (in append mode)
-var accessLogStream = fs.createWriteStream(__dirname + '/access.log', {flags: 'a'})
+//noinspection Eslint
+var accessLogStream = fs.createWriteStream(__dirname + "/access.log",
+    {flags: "a"});
 app.use(logger("common", {stream: accessLogStream}));
 
 // PARSERS
@@ -58,6 +61,7 @@ app.use("/stats", stats);
 app.use("/anonpersons", anonPersons);
 
 // global anonperson counter
+//noinspection Eslint
 anonPersonCount = 0; //TODO UGLY global variable !!!
 
 // catch 404 and forward to error handler
@@ -81,7 +85,7 @@ if (app.get("env") === "development") {
 // development error handler
 // will print stacktrace
 if (app.get("env") === "development") {
-    app.use(function(err, req, res, next) {
+    app.use(function(err, req, res) {
         "use strict";
         res.status(err.status || 500);
         res.render("error", {
@@ -93,7 +97,7 @@ if (app.get("env") === "development") {
 
 // production error handler
 // no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+app.use(function(err, req, res) {
     "use strict";
     res.status(err.status || 500);
     res.render("error", {

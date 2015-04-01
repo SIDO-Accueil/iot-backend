@@ -1,33 +1,22 @@
 /*eslint-env node*/
 
+var md5 = require("MD5");
+
 function initJSON(badge) {
     "use strict";
-    var s =
+    var p =
     {
         "id": badge,
-        "civilite": "",
-        "nom": "",
-        "prenom": "",
-        "email": "",
-        "telephone": "",
-        "adresse": "",
-        "code-postal": "",
-        "ville": "",
-        "pays": "",
-        "linkedin": "",
-        "twitter": "",
-        "entreprise": "",
-        "type-entreprise": "",
-        "chiffre-affaire": "",
-        "nb-salaries": "",
-        "secteur": "",
-        "service": "",
-        "fonction": "",
-        "site-web": ""
+        "civilite": "M.",
+        "nom": md5(badge),
+        "prenom": md5(md5(badge)),
+        "twitter": "@" + md5(md5(badge)) + md5(badge),
+        "email": md5(md5(md5(badge))) + "@mail.me",
+        "company": md5(md5(md5(md5(md5(badge)))))
     };
-    return s;
+    return p;
 }
 
 module.exports = {
-    initJSON: initJSON
+    getPerson: initJSON
 };
