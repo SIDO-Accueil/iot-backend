@@ -93,49 +93,58 @@ router.get("/:id", function(req, res) {
 router.put("/", function(req, res) {
     var newSidome = req.body;
 
-    client.search({
-        "index": "sidomes",
-        "q": newSidome.id
-    }).then(function (body) {
+    if (!newSidome.numsidome) {
+        // 'newSidome' sidome come from the web client application
 
-        if (body.hits.total > 1) {
-            // multiples results matchs
-            // error 500
-            res.status(500);
-            res.send({});
+        // fix sidome format
+        newSidome.fromTable = true;
+        newSidome.hasTwitter = false;
 
-        } else if (body.hits.total === 0) {
-            // 404
-            res.status(404);
-            res.send({});
-        } else {
+        client.search({
+            "index": "sidomes",
+            "q": newSidome.id
+        }).then(function (body) {
 
-            // the existing sidome has been found
-            // let's update it
-
-            var now = moment();
-            newSidome.lastModified = now.unix();
-
-            client.index({
-                index: "sidomes",
-                type: "sidomes",
-                id: newSidome.id,
-                body: newSidome
-            }).then(function() {
-                res.status(200);
-                res.send();
-            }, function (error) {
-                console.trace(error.message);
+            if (body.hits.total > 1) {
+                // multiples results matchs
+                // error 500
                 res.status(500);
                 res.send({});
-            });
-        }
-    }, function (error) {
-        console.trace(error.message);
-        res.status(500);
-        res.send({});
-    });
 
+            } else if (body.hits.total === 0) {
+                // 404
+                res.status(404);
+                res.send({});
+            } else {
+
+                // the existing sidome has been found
+                // let's update it
+
+                var now = moment();
+                newSidome.lastModified = now.unix();
+
+                client.index({
+                    index: "sidomes",
+                    type: "sidomes",
+                    id: newSidome.id,
+                    body: newSidome
+                }).then(function() {
+                    res.status(200);
+                    res.send();
+                }, function (error) {
+                    console.trace(error.message);
+                    res.status(500);
+                    res.send({});
+                });
+            }
+        }, function (error) {
+            console.trace(error.message);
+            res.status(500);
+            res.send({});
+        });
+    } else {
+        // 'newSidome' sidome come from an mobile application
+    }
 });
 
 router.post("/", function(req, res) {
@@ -144,25 +153,37 @@ router.post("/", function(req, res) {
     var now = moment();
     p.lastModified = now.unix();
 
-    client.index({
-        index: "sidomes",
-        type: "sidomes",
-        id: p.id,
-        body: p
-    }).then(function(d) {
-        if (!d.created) {
-            client.search({
-                "index": "sidomes",
-                "q": p.id
-            }).then(function (body) {
-                res.status(409);
-                res.send(body.hits.hits[0]._source);
-            });
-        } else {
-            res.status(201);
-            res.send({"created": d.created});
-        }
-    });
+    if (!p.numsidome) {
+        // 'p' sidome come from the web client application
+
+        // fix sidome format
+        p.fromTable = true;
+        p.hasTwitter = false;
+
+        client.index({
+            index: "sidomes",
+            type: "sidomes",
+            id: p.id,
+            body: p
+        }).then(function(d) {
+            if (!d.created) {
+                client.search({
+                    "index": "sidomes",
+                    "q": p.id
+                }).then(function (body) {
+                    res.status(409);
+                    //noinspection Eslint
+                    res.send(body.hits.hits[0]._source);
+                });
+            } else {
+                res.status(201);
+                res.send({"created": d.created});
+            }
+        });
+    } else {
+        // 'p' sidome come from an mobile application
+        // search from the 32 sidomes list and construct the associated sidome
+    }
 });
 
 module.exports = router;
