@@ -4,10 +4,10 @@
 
 var express = require("express");
 var elasticsearch = require("elasticsearch");
-var sidomeinoutmodel = require("../util/sidome-inout-model");
 var moment = require("moment");
 
 var sidomes = require("../util/sidome-inout-model");
+var sidomefactory = require("../util/sidome-factory").getSidome;
 
 //noinspection Eslint
 var router = express.Router();
@@ -90,62 +90,96 @@ router.get("/:id", function(req, res) {
     });
 });
 
-router.put("/", function(req, res) {
-    var newSidome = req.body;
+var updateSidome = function(newSidome, res) {
+    client.search({
+        "index": "sidomes",
+        "q": newSidome.id
+    }).then(function (body) {
 
-    if (!newSidome.numsidome) {
+        if (body.hits.total > 1) {
+            // multiples results matchs
+            // error 500
+            res.status(500);
+            res.send({});
+
+        } else if (body.hits.total === 0) {
+            // 404
+            res.status(404);
+            res.send({});
+        } else {
+
+            // the existing sidome has been found
+            // let's update it
+
+            var now = moment();
+            newSidome.lastModified = now.unix();
+
+            client.index({
+                index: "sidomes",
+                type: "sidomes",
+                id: newSidome.id,
+                body: newSidome
+            }).then(function() {
+                res.status(200);
+                res.send();
+            }, function (error) {
+                console.trace(error.message);
+                res.status(500);
+                res.send({});
+            });
+        }
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send({});
+    });
+};
+
+router.put("/", function(req, res) {
+    var p = req.body;
+
+    if (!p.numsidome) {
         // 'newSidome' sidome come from the web client application
+        var newSidome = p;
 
         // fix sidome format
         newSidome.fromTable = true;
         newSidome.hasTwitter = false;
 
-        client.search({
-            "index": "sidomes",
-            "q": newSidome.id
-        }).then(function (body) {
-
-            if (body.hits.total > 1) {
-                // multiples results matchs
-                // error 500
-                res.status(500);
-                res.send({});
-
-            } else if (body.hits.total === 0) {
-                // 404
-                res.status(404);
-                res.send({});
-            } else {
-
-                // the existing sidome has been found
-                // let's update it
-
-                var now = moment();
-                newSidome.lastModified = now.unix();
-
-                client.index({
-                    index: "sidomes",
-                    type: "sidomes",
-                    id: newSidome.id,
-                    body: newSidome
-                }).then(function() {
-                    res.status(200);
-                    res.send();
-                }, function (error) {
-                    console.trace(error.message);
-                    res.status(500);
-                    res.send({});
-                });
-            }
-        }, function (error) {
-            console.trace(error.message);
-            res.status(500);
-            res.send({});
-        });
+        updateSidome(newSidome, res);
     } else {
         // 'newSidome' sidome come from an mobile application
+        sidomefactory(p.id, p.numsidome)
+            .then(function(sidome) {
+                updateSidome(sidome, res);
+            }).catch(function(err) {
+                res.send(err);
+            });
     }
 });
+
+var addSidome = function (sidome, res) {
+    client.index({
+        index: "sidomes",
+        type: "sidomes",
+        id: sidome.id,
+        body: sidome
+    }).then(function(d) {
+        if (!d.created) {
+            client.search({
+                "index": "sidomes",
+                "q": sidome.id
+            }).then(function (body) {
+                res.status(409);
+                //noinspection Eslint
+                res.send(body.hits.hits[0]._source);
+            });
+        } else {
+            res.status(201);
+            res.send({"created": d.created});
+        }
+    });
+};
 
 router.post("/", function(req, res) {
     var p = req.body;
@@ -160,29 +194,16 @@ router.post("/", function(req, res) {
         p.fromTable = true;
         p.hasTwitter = false;
 
-        client.index({
-            index: "sidomes",
-            type: "sidomes",
-            id: p.id,
-            body: p
-        }).then(function(d) {
-            if (!d.created) {
-                client.search({
-                    "index": "sidomes",
-                    "q": p.id
-                }).then(function (body) {
-                    res.status(409);
-                    //noinspection Eslint
-                    res.send(body.hits.hits[0]._source);
-                });
-            } else {
-                res.status(201);
-                res.send({"created": d.created});
-            }
-        });
+        addSidome(p, res);
     } else {
         // 'p' sidome come from an mobile application
         // search from the 32 sidomes list and construct the associated sidome
+        sidomefactory(p.id, p.numsidome)
+            .then(function(sidome) {
+                addSidome(sidome, res);
+            }).catch(function(err) {
+                res.send(err);
+            });
     }
 });
 
