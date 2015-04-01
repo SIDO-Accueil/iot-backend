@@ -9,6 +9,8 @@ var moment = require("moment");
 var sidomesaddrm = require("../util/sidome-inout-model");
 var sidomefactory = require("../util/sidome-factory").getSidome;
 
+var ROTATION_TIME_SEC = 20;
+
 //noinspection Eslint
 var router = express.Router();
 
@@ -75,8 +77,8 @@ router.get("/", function(req, res) {
         var fromTableToAdd = allSidomes.filter(function(s) {
             if (s.fromTable && !s.visible) {
                 var lastMod = moment.unix(s.lastModified);
-                var nowMinus20 = moment().subtract(60, "seconds");
-                if (lastMod.isBefore(nowMinus20)) {
+                var nowMinus60 = moment().subtract(ROTATION_TIME_SEC, "seconds");
+                if (lastMod.isBefore(nowMinus60)) {
                     return false;
                 } else {
                     return true;
@@ -84,9 +86,58 @@ router.get("/", function(req, res) {
             }
         });
 
+        fromTableToAdd.forEach(function(s) {
+            // update each sidome that will be shown at the screen
+            s.visible = true;
+            s.lastDisplayed = moment().unix();
+
+            client.index({
+                index: "sidomes",
+                type: "sidomes",
+                id: s.id,
+                body: s
+            }).then(function() {
+
+            }, function (error) {
+                console.trace(error.message);
+            });
+        });
+
+        var fromTableToRm = allSidomes.filter(function(s) {
+            if (s.fromTable && s.visible) {
+                var lastDisplayed = moment.unix(s.lastDisplayed);
+                var nowMinus60 = moment().subtract(ROTATION_TIME_SEC, "seconds");
+                if (lastDisplayed.isBefore(nowMinus60)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        });
+
+        fromTableToRm.forEach(function(s) {
+            // update each sidome that will be removed at the screen
+            s.visible = false;
+
+            client.index({
+                index: "sidomes",
+                type: "sidomes",
+                id: s.id,
+                body: s
+            }).then(function() {
+
+            }, function (error) {
+                console.trace(error.message);
+            });
+        });
+
+        var fromTableToRmIds = fromTableToRm.map(function(s) {
+           return {"id": s.id};
+        });
+
         //noinspection Eslint
         var ans = sidomesaddrm.responseFactory(anonPersonCount,
-                                               fromTableToAdd, []);
+                                               fromTableToAdd, fromTableToRmIds);
 
         res.send(ans);
     }, function (error) {
@@ -94,8 +145,6 @@ router.get("/", function(req, res) {
         res.status(500);
         res.send({});
     });
-
-    //res.send(sidomes.initJSON("abc1234", 2));
 });
 
 router.get("/:id", function(req, res) {
