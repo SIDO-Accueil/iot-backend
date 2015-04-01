@@ -35,6 +35,12 @@ elasticClient.cluster.health()
         console.trace(error.message);
     });
 
+var backoff = 1000; // backoff starting at 1sec
+var nextBackoff = function () {
+    backoff *= 2;
+    return backoff;
+};
+
 var getStreams = function (hashtagslist, lang) {
     console.log("getstream ok");
 
@@ -73,6 +79,17 @@ var getStreams = function (hashtagslist, lang) {
         });
 
         stream.on("error", function (error) {
+            var waitXsec = new Promise(function (resolve, reject) {
+                setTimeout(function() {
+                    resolve();
+                }, nextBackoff());
+            });
+            waitXsec.then(function () {
+                console.log("getStreams restarts after waiting " +
+                            backoff + "ms");
+                getStreams(hashtagslist, lang); // dangerous recursive call ?
+            });
+
             console.log(error);
         });
     });
