@@ -116,64 +116,89 @@ OR if the person already exists in our database:
 ```
 
 # Ressource Sidome (avatar)
+## GET /sidomes
+### description
+Get sidomes to add to the view, to remove to the view, and the count of 
+anonymous persons.
+### Resp
+```
+{
+    "nb": 10,
+    "in": [
+        {
+            "default": false,
+            "visible": true,
+            "id": "pkpk",
+            "color": {
+                "r": 164,
+                "g": 40,
+                "b": 75
+            },
+            "nodes": {
+                "node1": {
+                    "x": -1.97,
+                    "y": -1.97,
+                    "z": 1.97
+                },
+                "node2": {
+                    "x": 1.25,
+                    "y": -1.25,
+                    "z": 1.25
+                },
+                "node3": {
+                    "x": 0.71,
+                    "y": 0.71,
+                    "z": 0.71
+                },
+                "node4": {
+                    "x": -1.25,
+                    "y": 1.25,
+                    "z": 1.25
+                },
+                "node5": {
+                    "x": 1.25,
+                    "y": -1.25,
+                    "z": -1.25
+                },
+                "node6": {
+                    "x": -1.25,
+                    "y": -1.25,
+                    "z": -1.25
+                },
+                "node7": {
+                    "x": -1.99,
+                    "y": 1.99,
+                    "z": -1.99
+                },
+                "node8": {
+                    "x": 0.55,
+                    "y": 0.55,
+                    "z": -0.55
+                }
+            },
+            "fromTable": true,
+            "hasTwitter": false,
+            "lastModified": 1427927998,
+            "lastDisplayed": 1427928002
+        }
+    ],
+    "out": [
+        {
+            "id": "a64b56c45"
+        },
+        {
+            "id": "65465b64c4"
+        }
+    ]
+}
+```
+
 ## POST /sidomes
 ### description
 We add the sidome to our own database
 ### request payload
 ```json
-{
-    "default": true,
-    "visible": true,
-    "id": "1842c57a991e",
-    "color": {
-        "r": 255,
-        "g": 255,
-        "b": 255
-    },
-    "nodes": {
-        "node1": {
-            "x": -1.25,
-            "y": -1.25,
-            "z": 1.25
-        },
-        "node2": {
-            "x": 1.25,
-            "y": -1.25,
-            "z": 1.25
-        },
-        "node3": {
-            "x": 1.25,
-            "y": 1.25,
-            "z": 1.25
-        },
-        "node4": {
-            "x": -1.73,
-            "y": 1.73,
-            "z": 1.73
-        },
-        "node5": {
-            "x": 1.25,
-            "y": -1.25,
-            "z": -1.25
-        },
-        "node6": {
-            "x": -1.61,
-            "y": -1.61,
-            "z": -1.61
-        },
-        "node7": {
-            "x": -1.25,
-            "y": 1.25,
-            "z": -1.25
-        },
-        "node8": {
-            "x": 1.25,
-            "y": 1.25,
-            "z": -1.25
-        }
-    },
-    "lastModified": 1426688386
-}
+
 ```
 ### Response
 ```
@@ -302,3 +327,15 @@ POST /sidomes
 ```HTTP
 PUT /sidomes
 ```
+# Ressource Anonperson
+## POST /anonpersons
+Specify the server that a person has been detected by the person sensors
+### Response:
+```
+{"anonPerson": 42}
+```
+### Comment:
+This counting have a side effect on the GET /stats.
+If we have 42 anonymous persons, the GET /stats will returns (42 + <the 
+number of personalized sidomes) in the field 'sidomesTotal'.
+
