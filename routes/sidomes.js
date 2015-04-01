@@ -6,7 +6,7 @@ var express = require("express");
 var elasticsearch = require("elasticsearch");
 var moment = require("moment");
 
-var sidomes = require("../util/sidome-inout-model");
+var sidomesaddrm = require("../util/sidome-inout-model");
 var sidomefactory = require("../util/sidome-factory").getSidome;
 
 //noinspection Eslint
@@ -38,7 +38,7 @@ router.get("/all", function(req, res) {
         "q": "*"
     }).then(function (body) {
 
-        // get all matchings persons
+        // get all sidomes
         var hits = body.hits.hits;
         var ans = [];
 
@@ -56,7 +56,46 @@ router.get("/all", function(req, res) {
 });
 
 router.get("/", function(req, res) {
-    res.send(sidomes.initJSON("abc1234", 2));
+    client.search({
+        "index": "sidomes",
+        "size": 10000,
+        "q": "*"
+    }).then(function (body) {
+
+        // get all sidomes !!
+        var hits = body.hits.hits;
+        var allSidomes = [];
+
+        hits.forEach(function(j){
+            //noinspection Eslint
+            allSidomes.push(j._source);
+        });
+
+        // get recently added sidomes from the table
+        var fromTableToAdd = allSidomes.filter(function(s) {
+            if (s.fromTable && !s.visible) {
+                var lastMod = moment.unix(s.lastModified);
+                var nowMinus20 = moment().subtract(60, "seconds");
+                if (lastMod.isBefore(nowMinus20)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        });
+
+        //noinspection Eslint
+        var ans = sidomesaddrm.responseFactory(anonPersonCount,
+                                               fromTableToAdd, []);
+
+        res.send(ans);
+    }, function (error) {
+        console.trace(error.message);
+        res.status(500);
+        res.send({});
+    });
+
+    //res.send(sidomes.initJSON("abc1234", 2));
 });
 
 router.get("/:id", function(req, res) {
@@ -91,6 +130,10 @@ router.get("/:id", function(req, res) {
 });
 
 var updateSidome = function(newSidome, res) {
+    var now = moment();
+    newSidome.lastModified = now.unix();
+    newSidome.visible = false;
+
     client.search({
         "index": "sidomes",
         "q": newSidome.id
@@ -110,9 +153,6 @@ var updateSidome = function(newSidome, res) {
 
             // the existing sidome has been found
             // let's update it
-
-            var now = moment();
-            newSidome.lastModified = now.unix();
 
             client.index({
                 index: "sidomes",
@@ -159,6 +199,10 @@ router.put("/", function(req, res) {
 });
 
 var addSidome = function (sidome, res) {
+    var now = moment();
+    sidome.lastModified = now.unix();
+    sidome.visible = false;
+
     client.index({
         index: "sidomes",
         type: "sidomes",
@@ -183,9 +227,6 @@ var addSidome = function (sidome, res) {
 
 router.post("/", function(req, res) {
     var p = req.body;
-
-    var now = moment();
-    p.lastModified = now.unix();
 
     if (!p.numsidome) {
         // 'p' sidome come from the web client application
