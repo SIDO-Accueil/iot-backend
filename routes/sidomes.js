@@ -75,7 +75,7 @@ router.get("/", function(req, res) {
 
         // get recently added sidomes from the table
         var fromTableToAdd = allSidomes.filter(function(s) {
-            if (s.fromTable && !s.visible && s.finish) {
+            if (!s.visible && s.finish) {
                 var lastMod = moment.unix(s.lastModified);
                 var nowMinus60 = moment().subtract(ROTATION_TIME_SEC, "seconds");
                 if (lastMod.isBefore(nowMinus60)) {
@@ -104,7 +104,7 @@ router.get("/", function(req, res) {
         });
 
         var fromTableToRm = allSidomes.filter(function(s) {
-            if (s.fromTable && s.visible) {
+            if (s.visible) {
                 var lastDisplayed = moment.unix(s.lastDisplayed);
                 var nowMinus60 = moment().subtract(ROTATION_TIME_SEC, "seconds");
                 if (lastDisplayed.isBefore(nowMinus60)) {
