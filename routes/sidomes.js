@@ -75,7 +75,7 @@ router.get("/", function(req, res) {
 
         // get recently added sidomes from the table
         var fromTableToAdd = allSidomes.filter(function(s) {
-            if (s.fromTable && !s.visible) {
+            if (s.fromTable && !s.visible && s.finish) {
                 var lastMod = moment.unix(s.lastModified);
                 var nowMinus60 = moment().subtract(ROTATION_TIME_SEC, "seconds");
                 if (lastMod.isBefore(nowMinus60)) {
@@ -294,6 +294,9 @@ router.post("/", function(req, res) {
         p.fromTable = true;
         p.hasTwitter = false;
 
+        if (anonPersonCount > 0) {
+            --anonPersonCount;
+        }
         addSidome(p, res);
     } else {
         // 'p' sidome come from an mobile application
