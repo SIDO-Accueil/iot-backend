@@ -81,7 +81,7 @@ router.get("/:id", function(req, res) {
     }, function (error) {
         console.trace(error.message);
         res.status(404);
-        res.send({"error": "empty database ??"});
+        res.send({});
     });
 });
 

@@ -14,7 +14,7 @@ function getSidome(badge, numsidome) {
             var numStr = numsidome;
         }
 
-        var sidomePath = "../util/JSONSidomes/" + numStr + ".json";
+        var sidomePath = "./util/JSONSidome/" + numStr + ".json";
 
         readFile(sidomePath, "utf8").then(function(sidome) {
             var sidomeAns = JSON.parse(sidome);
