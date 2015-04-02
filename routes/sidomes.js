@@ -9,7 +9,7 @@ var moment = require("moment");
 var sidomesaddrm = require("../util/sidome-inout-model");
 var sidomefactory = require("../util/sidome-factory").getSidome;
 
-var ROTATION_TIME_SEC = 20;
+var ROTATION_TIME_SEC = 60;
 
 //noinspection Eslint
 var router = express.Router();
@@ -142,8 +142,11 @@ router.get("/", function(req, res) {
         res.send(ans);
     }, function (error) {
         console.trace(error.message);
-        res.status(500);
-        res.send({});
+        res.status(200);
+        var ans = sidomesaddrm.responseFactory(anonPersonCount,
+            [], []);
+
+        res.send(ans);
     });
 });
 
