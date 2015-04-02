@@ -94,6 +94,7 @@ router.post("/:id", function(req, res) {
     var id;
     if (!req.body.id) {
         id = req.params.id;
+        p.id = id;
     } else if (req.body.id && req.body.id !== req.params.id) {
         res.status(400);
         res.send({"error": "ids dont matchs"});
