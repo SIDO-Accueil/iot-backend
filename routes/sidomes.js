@@ -176,8 +176,8 @@ router.get("/:id", function(req, res) {
         }
     }, function (error) {
         console.trace(error.message);
-        res.status(500);
-        res.send({});
+        res.status(404);
+        res.send({"err": "sidome notfound"});
     });
 });
 
@@ -231,7 +231,7 @@ var updateSidome = function(newSidome, res) {
         }
     }, function (error) {
         console.trace(error.message);
-        res.status(500);
+        res.status(404);
         res.send({});
     });
 };
@@ -253,8 +253,8 @@ router.put("/", function(req, res) {
         sidomefactory(p.id, p.numsidome)
             .then(function(sidome) {
                 updateSidome(sidome, res);
-            }).catch(function(err) {
-                res.send(err);
+            }).catch(function() {
+                res.send({"err": "sidomefactory(p.id, p.numsidome) FAILURE"});
             });
     }
 });
