@@ -185,7 +185,7 @@ var fixSidomeColor = function (sidome) {
     var color = sidome.color;
     color.r = Math.round(color.r, 0);
     color.g = Math.round(color.g, 0);
-    color.b = Math.round(color.g, 0);
+    color.b = Math.round(color.b, 0);
     return sidome;
 };
 
