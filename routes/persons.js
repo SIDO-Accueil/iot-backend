@@ -52,7 +52,6 @@ router.get("/", function(req, res) {
     });
 });
 
-/* GET one persons from Dorian API*/
 router.get("/:id", function(req, res) {
 
     client.search({

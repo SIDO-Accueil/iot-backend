@@ -12,6 +12,8 @@ npm install
 bin/elasticsearch
 ```
 ## Launch the Node.js server:
+### The configuration fun begins
+#### TWITTER
 To be able to connect to the twitter REST API, we need to set some environments variables.
 ```
 Consumer Key (API Key),
@@ -29,6 +31,7 @@ export TWITTER_ACCESS_TOKEN_KEY="Your Access Token"
 export TWITTER_ACCESS_TOKEN_SECRET="Your Access Token Secret"
 ```
 
+#### MYSQL
 To be able to connect to the SQL database containing users phones statistics,
 we need to set some environments variables.
 ```
@@ -45,17 +48,45 @@ export MYSQL_DATABASE="mydatabasename"
 export MYSQL_PASSWORD="password"
 ```
 
+#### SMTP
+```
+SMTP_USER
+SMTP_PWD
+SMTP_HOST
+SMTP_PORT
+SMTP_SSL
+SMTP_ADRESS
+```
+are **required**.
+```bash
+export SMTP_USER="SMTP username"
+export SMTP_PWD="SMTP password"
+export SMTP_HOST="URL of the SMTP server"
+export SMTP_SSL="true|false"
+export SMTP_ADRESS="the email adress we will use to send emails"
+```
+
+### The configuration fun is done, let's start the REST API :)
 And start the Node.js server:
 ```bash
 node bin/www
 ```
 
-Or in fishshell:
+Or in fishshell without *export*:
 ```
-env TWITTER_CONSUMER_KEY="Your Consumer Key (API Key)" TWITTER_CONSUMER_SECRET="Your Consumer Secret (API Secret)"\
-    TWITTER_ACCESS_TOKEN_KEY="Your Access Token" TWITTER_ACCESS_TOKEN_SECRET="Your Access Token Secret"\
-    MYSQL_URL="example.org" MYSQL_USER="username"\
-    MYSQL_DATABASE="mydatabasename" MYSQL_PASSWORD="password"\
+env TWITTER_CONSUMER_KEY="Your Consumer Key (API Key)"\
+    TWITTER_CONSUMER_SECRET="Your Consumer Secret (API Secret)"\
+    TWITTER_ACCESS_TOKEN_KEY="Your Access Token"\ 
+    TWITTER_ACCESS_TOKEN_SECRET="Your Access Token Secret"\
+    MYSQL_URL="example.org"\ 
+    MYSQL_USER="username"\
+    MYSQL_DATABASE="mydatabasename"\
+    MYSQL_PASSWORD="password"\
+    SMTP_USER="SMTP username"
+    SMTP_PWD="SMTP password"
+    SMTP_HOST="URL of the SMTP server"
+    SMTP_SSL="true|false"
+    SMTP_ADRESS="the email adress we will use to send emails"
     node bin/www
 ```
 
