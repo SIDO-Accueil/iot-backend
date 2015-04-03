@@ -157,18 +157,18 @@ router.get("/", function(req, res) {
                 res.send(output);
             }).catch(function(err) {
                 console.log(err);
-                res.status(500);
-                res.send(err);
+                res.status(200);
+                res.send({});
             });
 
         }).catch(function(err) {
             console.error(err);
-            res.status(500);
+            res.status(200);
             res.send({});
         });
     }).catch(function(err) {
         console.error(err);
-        res.status(500);
+        res.status(200);
         res.send({});
     });
 });
