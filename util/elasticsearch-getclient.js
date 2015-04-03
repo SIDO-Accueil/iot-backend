@@ -4,8 +4,12 @@
 var elasticsearch = require("elasticsearch");
 
 var client = new elasticsearch.Client({
-    host: "localhost:9200"
-    //log: ""
+    host: "localhost:9200",
+    log: {
+        type: "file",
+        level: "trace",
+        path: "logs/elasticsearch-nodejs.log"
+    }
 });
 
 console.log("singleton elasticsearch client created");

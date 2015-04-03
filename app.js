@@ -1,6 +1,9 @@
 /*eslint-env node*/
 /*global __dirname:false*/
 
+//add timestamps in front of log messages
+require("console-stamp")(console, "isoDateTime");
+
 var express = require("express");
 var path = require("path");
 var logger = require("morgan");
@@ -41,9 +44,13 @@ app.use(function(req, res, next) {
 // LOGS
 // create a write stream (in append mode)
 //noinspection Eslint
-var accessLogStream = fs.createWriteStream(__dirname + "./logs/access.log",
+var accessLogStream = fs.createWriteStream(__dirname + "/logs/access.log",
     {flags: "a"});
-app.use(logger("common", {stream: accessLogStream}));
+logger.format('mydate', function() {
+    var df = require('console-stamp/node_modules/dateformat');
+    return df(new Date(), "isoDateTime");
+});
+app.use(logger('[:mydate] :method :url :status :res[content-length] - :remote-addr - :response-time ms', {stream: accessLogStream}));
 
 // PARSERS
 app.use(bodyParser.json());
