@@ -3,22 +3,19 @@
 "use strict";
 
 var express = require("express");
-var elasticsearch = require("elasticsearch");
 var moment = require("moment");
 
 var sidomesaddrm = require("../util/sidome-inout-model");
 var sidomefactory = require("../util/sidome-factory").getSidome;
+var elasticgetclient = require("../util/elasticsearch-getclient");
 
 var ROTATION_TIME_SEC = 60;
 
 //noinspection Eslint
 var router = express.Router();
 
-// create a client instance of elasticsearch
-var client = new elasticsearch.Client({
-    host: "localhost:9200",
-    log: "trace"
-});
+// get a client instance of elasticsearch
+var client = elasticgetclient.get();
 
 // small check to ensure the status of the elasticsearch cluster
 client.cluster.health()

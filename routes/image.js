@@ -2,17 +2,15 @@
 "use strict";
 
 var express = require("express");
-var elasticsearch = require("elasticsearch");
 var email = require("emailjs");
+
+var elasticgetclient = require("../util/elasticsearch-getclient");
 
 //noinspection Eslint
 var router = express.Router();
 
-// create a client instance of elasticsearch
-var client = new elasticsearch.Client({
-    host: "localhost:9200",
-    log: "trace"
-});
+// get a client instance of elasticsearch
+var client = elasticgetclient.get();
 
 var smtpParams = {
     user: process.env.SMTP_USER,

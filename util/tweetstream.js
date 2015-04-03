@@ -2,7 +2,7 @@
 "use strict";
 
 var Twitter = require("twitter");
-var elasticsearch = require("elasticsearch");
+var elasticgetclient = require("../util/elasticsearch-getclient");
 
 if (!process.env.TWITTER_CONSUMER_KEY || !process.env.TWITTER_CONSUMER_SECRET ||
     !process.env.TWITTER_ACCESS_TOKEN_KEY || !process.env.TWITTER_ACCESS_TOKEN_SECRET) {
@@ -18,11 +18,9 @@ var client = new Twitter({
     access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
-// create a client instance of elasticsearch
-var elasticClient = new elasticsearch.Client({
-    host: "localhost:9200"
-    //log: "trace"
-});
+// get a client instance of elasticsearch
+var elasticClient = elasticgetclient.get();
+
 // small check to ensure the status of the elasticsearch cluster
 elasticClient.cluster.health()
     .then(function(resp) {

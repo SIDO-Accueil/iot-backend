@@ -82,11 +82,11 @@ env TWITTER_CONSUMER_KEY="Your Consumer Key (API Key)"\
     MYSQL_USER="username"\
     MYSQL_DATABASE="mydatabasename"\
     MYSQL_PASSWORD="password"\
-    SMTP_USER="SMTP username"
-    SMTP_PWD="SMTP password"
-    SMTP_HOST="URL of the SMTP server"
-    SMTP_SSL="true|false"
-    SMTP_ADRESS="the email adress we will use to send emails"
+    SMTP_USER="SMTP username"\
+    SMTP_PWD="SMTP password"\
+    SMTP_HOST="URL of the SMTP server"\
+    SMTP_SSL="true|false"\
+    SMTP_ADRESS="the email adress we will use to send emails"\
     node bin/www
 ```
 

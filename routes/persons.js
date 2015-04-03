@@ -2,30 +2,12 @@
 "use strict";
 
 var express = require("express");
-var elasticsearch = require("elasticsearch");
-var personmodel = require("../util/person-model");
-
 //noinspection Eslint
 var router = express.Router();
+var elasticgetclient = require("../util/elasticsearch-getclient");
 
-// create a client instance of elasticsearch
-var client = new elasticsearch.Client({
-    host: "localhost:9200",
-    log: "trace"
-});
-
-// small check to ensure the status of the elasticsearch cluster
-client.cluster.health()
-    .then(function(resp) {
-        if (resp.status !== "green") {
-            console.log("Please check unassigned_shards");
-        } else {
-            console.log("ElasticSearch: OK");
-        }
-    }, function (error) {
-        console.trace(error.message);
-    });
-
+// get a client instance of elasticsearch
+var client = elasticgetclient.get();
 
 /* GET persons listing. */
 router.get("/", function(req, res) {

@@ -41,7 +41,7 @@ app.use(function(req, res, next) {
 // LOGS
 // create a write stream (in append mode)
 //noinspection Eslint
-var accessLogStream = fs.createWriteStream(__dirname + "/access.log",
+var accessLogStream = fs.createWriteStream(__dirname + "./logs/access.log",
     {flags: "a"});
 app.use(logger("common", {stream: accessLogStream}));
 
