@@ -162,9 +162,30 @@ router.get("/", function(req, res) {
             });
 
         }).catch(function(err) {
-            console.error(err);
-            res.status(200);
-            res.send({});
+            // we have stats about tweets but not stats for sidomes
+
+            output['sidomesPerso'] = 0;
+            output['sidomesTotal'] = 0;
+
+            Promise.props({
+                ios: mysqlQueryWrapper(connection, queryIos, "ios"),
+                win: mysqlQueryWrapper(connection, queryWin, "win"),
+                android: mysqlQueryWrapper(connection, queryAndroid, "android"),
+                other: mysqlQueryWrapper(connection, queryOther, "other")
+            }).then(function(phonesStats) {
+                console.log(phonesStats);
+                connection.end();
+
+                output["ios"] = phonesStats["ios"];
+                output["win"] = phonesStats["win"];
+                output["android"] = phonesStats["android"];
+                output["other"] = phonesStats["other"];
+                res.send(output);
+            }).catch(function(err) {
+                console.log(err);
+                res.status(200);
+                res.send({});
+            });
         });
     }).catch(function(err) {
         console.error(err);
