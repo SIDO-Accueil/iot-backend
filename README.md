@@ -4,6 +4,10 @@ Just a small backend using Node.js &amp; ElasticSearch to handle persons represe
 ```bash
 npm install
 ```
+
+You need to have imagemagick installed on the system. This is because we do 
+some image processing on the image before the sidome is send by email.
+
 ## Elasticsearch
 ### get Elasticsearch
 [Download](http://www.elasticsearch.org/download}) and unzip/untar the Elasticsearch official distribution.

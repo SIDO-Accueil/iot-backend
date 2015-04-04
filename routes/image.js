@@ -3,6 +3,7 @@
 
 var express = require("express");
 var email = require("emailjs");
+var im = require('imagemagick');
 
 var elasticgetclient = require("../util/elasticsearch-getclient");
 
@@ -109,11 +110,26 @@ router.post("/:id", function(req, res) {
                     console.log(err);
                 });
 
-                require("fs").readFile("out.png", function (err, data) {
-                    if (err) throw err;
-                    console.log(data);
-                    sendEmail(destFirstName, destLastname, destEmailAddress, data);
-                });
+                // TODO NEED TO WRITE A FILE BY PERSON AND REMOVE IT AFTER THE EMAIL SENT !!!
+                im.convert(["out.png", "-alpha", "set", "-channel", "RGBA",
+                        "-fill", "none", "-fuzz", "5%", "-opaque", "#ffffff",
+                        "-background", "black", "-alpha", "remove", "-alpha",
+                        "set", "-channel", "RGBA", "-fill", "none", "-fuzz",
+                        "5%", "-opaque", "black", "out-fixed.png"],
+                    function(err, stdout){
+                        if (err) {
+                            throw err;
+                        }
+                        console.log("stdout:", stdout);
+
+                        require("fs").readFile("out-fixed.png", function (err, data) {
+                            if (err) {
+                                throw err;
+                            }
+                            console.log(data);
+                            sendEmail(destFirstName, destLastname, destEmailAddress, data);
+                        });
+                    });
             } else {
                 res.status(400);
                 res.send({"err": "multiples persons matches :/"});
