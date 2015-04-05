@@ -76,21 +76,21 @@ var sendEmail = function (destFirstName, destLastname, emailAdress, image) {
 };
 
 var removeSidomeFile = function (idUsr) {
-    fs.unlink("../sidomes-png/out-" + idUsr + "fixed.png", function (err) {
+    fs.unlink("./sidomes-png/out-" + idUsr + "fixed.png", function (err) {
         if (err) {
             console.log(err);
-            console.log("FAILED REMOVED ../sidomes-png/out-" + idUsr + "fixed.png");
+            console.log("FAILED REMOVED ./sidomes-png/out-" + idUsr + "fixed.png");
         } else {
-            console.log("SUCCESSFULLY REMOVED ../sidomes-png/out-" + idUsr + "fixed.png");
+            console.log("SUCCESSFULLY REMOVED ./sidomes-png/out-" + idUsr + "fixed.png");
         }
 
     });
-    fs.unlink("../sidomes-png/out-" + idUsr + ".png", function (err) {
+    fs.unlink("./sidomes-png/out-" + idUsr + ".png", function (err) {
         if (err) {
             console.log(err);
-            console.log("FAILED REMOVED ../sidomes-png/out-" + idUsr + ".png");
+            console.log("FAILED REMOVED ./sidomes-png/out-" + idUsr + ".png");
         } else {
-            console.log("SUCCESSFULLY REMOVED ../sidomes-png/out-" + idUsr + ".png");
+            console.log("SUCCESSFULLY REMOVED ./sidomes-png/out-" + idUsr + ".png");
         }
     });
 };
@@ -136,28 +136,28 @@ router.post("/:id", function(req, res) {
                 //noinspection Eslint
                 var destFirstName = body.hits.hits[0]._source.prenom;
 
-                fs.writeFile("../sidomes-png/out-" + idUsr + ".png",
+                fs.writeFile("./sidomes-png/out-" + idUsr + ".png",
                     base64Data, "base64", function(err) {
                         console.log(err);
-                        console.log("CANNOT WRITE " + "../sidomes-png/out-" + idUsr + ".png");
+                        console.log("CANNOT WRITE " + "./sidomes-png/out-" + idUsr + ".png");
                     });
 
-                im.convert(["../sidomes-png/out-" + idUsr + ".png",
+                im.convert(["./sidomes-png/out-" + idUsr + ".png",
                         "-alpha", "set", "-channel", "RGBA",
                         "-fill", "none", "-fuzz", "5%", "-opaque", "#ffffff",
                         "-background", "black", "-alpha", "remove", "-alpha",
                         "set", "-channel", "RGBA", "-fill", "none", "-fuzz",
-                        "5%", "-opaque", "black", "../sidomes-png/out-" + idUsr + "fixed.png"],
+                        "5%", "-opaque", "black", "./sidomes-png/out-" + idUsr + "fixed.png"],
                     function(err, stdout){
                         if (err) {
                             console.log(err);
                         }
                         console.log("stdout:", stdout);
 
-                        fs.readFile("../sidomes-png/out-" + idUsr + "fixed.png", function (err2, data) {
+                        fs.readFile("./sidomes-png/out-" + idUsr + "fixed.png", function (err2, data) {
                             if (err2) {
                                 console.log(err2);
-                                console.log("CANNOT READ " + "../sidomes-png/out-" + idUsr + "fixed.png");
+                                console.log("CANNOT READ " + "./sidomes-png/out-" + idUsr + "fixed.png");
                             }
                             console.log(data);
                             sendEmail(destFirstName, destLastname, destEmailAddress, data)
