@@ -142,33 +142,32 @@ router.post("/:id", function(req, res) {
                             console.log(err);
                             console.log("CANNOT WRITE " + "./sidomes-png/out-" + idUsr + ".png");
                         }
-                    });
+                        im.convert(["./sidomes-png/out-" + idUsr + ".png",
+                                "-alpha", "set", "-channel", "RGBA",
+                                "-fill", "none", "-fuzz", "5%", "-opaque", "#ffffff",
+                                "-background", "black", "-alpha", "remove", "-alpha",
+                                "set", "-channel", "RGBA", "-fill", "none", "-fuzz",
+                                "5%", "-opaque", "black", "./sidomes-png/out-" + idUsr + "fixed.png"],
+                            function(err2, stdout){
+                                if (err2) {
+                                    console.log(err2);
+                                }
+                                console.log("stdout:", stdout);
 
-                im.convert(["./sidomes-png/out-" + idUsr + ".png",
-                        "-alpha", "set", "-channel", "RGBA",
-                        "-fill", "none", "-fuzz", "5%", "-opaque", "#ffffff",
-                        "-background", "black", "-alpha", "remove", "-alpha",
-                        "set", "-channel", "RGBA", "-fill", "none", "-fuzz",
-                        "5%", "-opaque", "black", "./sidomes-png/out-" + idUsr + "fixed.png"],
-                    function(err, stdout){
-                        if (err) {
-                            console.log(err);
-                        }
-                        console.log("stdout:", stdout);
-
-                        fs.readFile("./sidomes-png/out-" + idUsr + "fixed.png", function (err2, data) {
-                            if (err2) {
-                                console.log(err2);
-                                console.log("CANNOT READ " + "./sidomes-png/out-" + idUsr + "fixed.png");
-                            }
-                            console.log(data);
-                            sendEmail(destFirstName, destLastname, destEmailAddress, data)
-                                .then(function() {
-                                    removeSidomeFile(idUsr);
-                                }).catch(function() {
-                                    removeSidomeFile(idUsr);
+                                fs.readFile("./sidomes-png/out-" + idUsr + "fixed.png", function (err3, data) {
+                                    if (err3) {
+                                        console.log(err3);
+                                        console.log("CANNOT READ " + "./sidomes-png/out-" + idUsr + "fixed.png");
+                                    }
+                                    console.log(data);
+                                    sendEmail(destFirstName, destLastname, destEmailAddress, data)
+                                        .then(function() {
+                                            removeSidomeFile(idUsr);
+                                        }).catch(function() {
+                                            removeSidomeFile(idUsr);
+                                        });
                                 });
-                        });
+                            });
                     });
             } else {
                 res.status(400);
