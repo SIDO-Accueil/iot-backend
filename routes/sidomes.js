@@ -1,5 +1,6 @@
 /*eslint-env node*/
-/*global __dirname:false*/
+/*global __dirname:false, anonPersonCount:true*/
+
 "use strict";
 
 var express = require("express");
@@ -53,6 +54,18 @@ router.get("/", function(req, res) {
         // get all sidomes !!
         var hits = body.hits.hits;
         var allSidomes = [];
+        var sidomesPersoTotal = hits.length;
+
+        // COUNT visibles sidomes
+        var sidomesVisiblesTotal = 0;
+        allSidomes.forEach(function(x) {
+            if(x.visible) {
+                ++sidomesVisiblesTotal;
+            }
+        });
+        var ratioSidomesVisibles = sidomesVisiblesTotal/sidomesPersoTotal;
+        console.log("ratio visible/persoTotal:" + ratioSidomesVisibles);
+
 
         hits.forEach(function(j){
             //noinspection Eslint
@@ -60,7 +73,7 @@ router.get("/", function(req, res) {
         });
 
         // get recently added sidomes from the table
-        var fromTableToAdd = allSidomes.filter(function(s) {
+        var recentsToAdd = allSidomes.filter(function(s) {
             if (!s.visible && s.finish) {
                 var lastMod = moment.unix(s.lastModified);
                 var nowMinus60 = moment().subtract(ROTATION_TIME_SEC, "seconds");
@@ -72,7 +85,7 @@ router.get("/", function(req, res) {
             }
         });
 
-        var fromTableToRm = allSidomes.filter(function(s) {
+        var oldToRm = allSidomes.filter(function(s) {
             if (s.visible) {
                 var lastDisplayed = moment.unix(s.lastDisplayed);
                 var nowMinus60 = moment().subtract(ROTATION_TIME_SEC, "seconds");
@@ -84,7 +97,7 @@ router.get("/", function(req, res) {
             }
         });
 
-        fromTableToRm.forEach(function(s) {
+        oldToRm.forEach(function(s) {
             // update each sidome that will be removed at the screen
             s.visible = false;
 
@@ -100,14 +113,31 @@ router.get("/", function(req, res) {
             });
         });
 
-        var fromTableToRmIds = fromTableToRm.map(function(s) {
+        var oldToRmIds = oldToRm.map(function(s) {
            return {"id": s.id};
         });
 
-        var promisesAddTweets = [];
-        var fromTableToAddWithTweets = [];
+        // We takes some old sidomes to add
+        allSidomes.forEach(function(s) {
+            if (!s.visible && s.finish) {
+                var lastMod = moment.unix(s.lastModified);
+                var nowMinus60 = moment().subtract(ROTATION_TIME_SEC, "seconds");
 
-        fromTableToAdd.forEach(function(s) {
+                if ( lastMod.isBefore(nowMinus60) &&
+                     !oldToRm.some(function(s2) { return s2.id === s.id; }) &&
+                     Math.random() > ratioSidomesVisibles
+                    ) {
+                    // olds ones, not visibles ones, and only if there is not much sidomes shown
+                        console.log("old sidome chosen to be shown:" + s.id);
+                        recentsToAdd.push(s);
+                }
+            }
+        });
+
+        var promisesAddTweets = [];
+        var recentsToAddWithTweets = [];
+
+        recentsToAdd.forEach(function(s) {
             // update each sidome that will be shown at the screen
             s.visible = true;
             s.lastDisplayed = moment().unix();
@@ -120,20 +150,20 @@ router.get("/", function(req, res) {
                             tweetsbyusername.countof(username)
                                 .then(function (count) {
                                     s.tweets = count;
-                                    fromTableToAddWithTweets.push(s);
+                                    recentsToAddWithTweets.push(s);
                                     resolve(s);
                                 })
                                 .catch(function (err) {
                                     console.error(err);
                                     s.tweets = 0;
-                                    fromTableToAddWithTweets.push(s);
+                                    recentsToAddWithTweets.push(s);
                                     reject(err);
                                 });
                         })
                         .catch(function (err) {
                             console.error(err);
                             s.tweets = 0;
-                            fromTableToAddWithTweets.push(s);
+                            recentsToAddWithTweets.push(s);
                             reject(err);
                         });
                 })
@@ -153,7 +183,7 @@ router.get("/", function(req, res) {
 
         Promise.all(promisesAddTweets).then(function () {
             var ans = sidomesaddrm.responseFactory(anonPersonCount,
-                fromTableToAddWithTweets, fromTableToRmIds);
+                recentsToAddWithTweets, oldToRmIds);
             console.log("we got tweets counts");
             res.send(ans);
         });
