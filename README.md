@@ -59,6 +59,7 @@ SMTP_PWD
 SMTP_HOST
 SMTP_PORT
 SMTP_SSL
+SMTP_TLS
 SMTP_ADRESS
 ```
 are **required**.
@@ -67,6 +68,7 @@ export SMTP_USER="SMTP username"
 export SMTP_PWD="SMTP password"
 export SMTP_HOST="URL of the SMTP server"
 export SMTP_SSL="true|false"
+export SMTP_TLS="true|false"
 export SMTP_ADRESS="the email adress we will use to send emails"
 ```
 

@@ -20,22 +20,10 @@ var smtpParams = {
     password: process.env.SMTP_PWD,
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
+    tls: process.env.SMTP_TLS,
     ssl: process.env.SMTP_SSL,
     address: process.env.SMTP_ADRESS
 };
-
-// TODO REMOVE THIS CODE DUPLICATION !!!
-// small check to ensure the status of the elasticsearch cluster
-client.cluster.health()
-    .then(function(resp) {
-        if (resp.status !== "green") {
-            console.log("Please check unassigned_shards");
-        } else {
-            console.log("ElasticSearch: OK");
-        }
-    }, function (error) {
-        console.trace(error.message);
-    });
 
 var sendEmail = function (destFirstName, destLastname, emailAdress, image) {
 
@@ -47,7 +35,8 @@ var sendEmail = function (destFirstName, destLastname, emailAdress, image) {
             password: smtpParams.password,
             host: smtpParams.host,
             port: smtpParams.port,
-            ssl: (smtpParams.ssl === "true")
+            ssl: (smtpParams.ssl === "true"),
+            tls: (smtpParams.tls === "true")
         });
 
         console.log("send");
@@ -56,7 +45,7 @@ var sendEmail = function (destFirstName, destLastname, emailAdress, image) {
         // send the message and get a callback with an error or details of the message that was sent
         server.send({
             text: "Merci pour votre participation au SIDO, vous trouverez en pièce jointe votre sidome ! ",
-            from: "Sidonie Sido <" + smtpParams.address + ">",
+            from: "Sido <" + smtpParams.address + ">",
             to: destFirstName + " " + destLastname + "<" + emailAdress + ">",
             subject: "[SIdO] Votre Sidome",
             attachment: [{
