@@ -3,7 +3,9 @@
 
 var express = require("express");
 var email = require("emailjs");
-var im = require('imagemagick');
+var im = require("imagemagick");
+var fs = require("fs");
+var Promise = require("bluebird");
 
 var elasticgetclient = require("../util/elasticsearch-getclient");
 
@@ -37,32 +39,60 @@ client.cluster.health()
 
 var sendEmail = function (destFirstName, destLastname, emailAdress, image) {
 
-    console.log(smtpParams);
+    return new Promise(function (resolve, reject) {
+        console.log(smtpParams);
 
-    var server = email.server.connect({
-        user: smtpParams.user,
-        password: smtpParams.password,
-        host: smtpParams.host,
-        port: smtpParams.port,
-        ssl: (smtpParams.ssl === "true")
+        var server = email.server.connect({
+            user: smtpParams.user,
+            password: smtpParams.password,
+            host: smtpParams.host,
+            port: smtpParams.port,
+            ssl: (smtpParams.ssl === "true")
+        });
+
+        console.log("send");
+        console.log(image);
+
+        // send the message and get a callback with an error or details of the message that was sent
+        server.send({
+            text: "Merci pour votre participation au SIDO, vous trouverez en pièce jointe votre sidome ! ",
+            from: "Sidonie Sido <" + smtpParams.address + ">",
+            to: destFirstName + " " + destLastname + "<" + emailAdress + ">",
+            subject: "[SIdO] Votre Sidome",
+            attachment: [{
+                data: image,
+                type: "image/png",
+                name: "sidome-" + destFirstName + "-" + destLastname + ".png"
+            }]
+        }, function(err, message) {
+            console.log(err || message);
+            if (err) {
+                reject(err);
+            } else {
+                resolve(message);
+            }
+        });
     });
+};
 
-    console.log("send");
-    console.log(image);
+var removeSidomeFile = function (idUsr) {
+    fs.unlink("../sidomes-png/out-" + idUsr + "fixed.png", function (err) {
+        if (err) {
+            console.log(err);
+            console.log("FAILED REMOVED ../sidomes-png/out-" + idUsr + "fixed.png");
+        } else {
+            console.log("SUCCESSFULLY REMOVED ../sidomes-png/out-" + idUsr + "fixed.png");
+        }
 
-    // send the message and get a callback with an error or details of the message that was sent
-    server.send({
-        text: "Merci pour votre participation au SIDO, vous trouverez en pièce jointe votre sidome ! ",
-        from: "Sidonie Sido <" + smtpParams.address + ">",
-        to: destFirstName + " " + destLastname + "<" + emailAdress + ">",
-        subject: "[SIdO] Votre Sidome",
-        attachment: [{
-            data: image,
-            type: "image/png",
-            name: "sidome-" + destFirstName + "-" + destLastname + ".png"
-        }]
-    }, function(err, message) { console.log(err || message); });
-
+    });
+    fs.unlink("../sidomes-png/out-" + idUsr + ".png", function (err) {
+        if (err) {
+            console.log(err);
+            console.log("FAILED REMOVED ../sidomes-png/out-" + idUsr + ".png");
+        } else {
+            console.log("SUCCESSFULLY REMOVED ../sidomes-png/out-" + idUsr + ".png");
+        }
+    });
 };
 
 router.post("/:id", function(req, res) {
@@ -106,28 +136,36 @@ router.post("/:id", function(req, res) {
                 //noinspection Eslint
                 var destFirstName = body.hits.hits[0]._source.prenom;
 
-                require("fs").writeFile("out.png", base64Data, "base64", function(err) {
-                    console.log(err);
-                });
+                fs.writeFile("../sidomes-png/out-" + idUsr + ".png",
+                    base64Data, "base64", function(err) {
+                        console.log(err);
+                        console.log("CANNOT WRITE " + "../sidomes-png/out-" + idUsr + ".png");
+                    });
 
-                // TODO NEED TO WRITE A FILE BY PERSON AND REMOVE IT AFTER THE EMAIL SENT !!!
-                im.convert(["out.png", "-alpha", "set", "-channel", "RGBA",
+                im.convert(["../sidomes-png/out-" + idUsr + ".png",
+                        "-alpha", "set", "-channel", "RGBA",
                         "-fill", "none", "-fuzz", "5%", "-opaque", "#ffffff",
                         "-background", "black", "-alpha", "remove", "-alpha",
                         "set", "-channel", "RGBA", "-fill", "none", "-fuzz",
-                        "5%", "-opaque", "black", "out-fixed.png"],
+                        "5%", "-opaque", "black", "../sidomes-png/out-" + idUsr + "fixed.png"],
                     function(err, stdout){
                         if (err) {
-                            throw err;
+                            console.log(err);
                         }
                         console.log("stdout:", stdout);
 
-                        require("fs").readFile("out-fixed.png", function (err, data) {
-                            if (err) {
-                                throw err;
+                        fs.readFile("../sidomes-png/out-" + idUsr + "fixed.png", function (err2, data) {
+                            if (err2) {
+                                console.log(err2);
+                                console.log("CANNOT READ " + "../sidomes-png/out-" + idUsr + "fixed.png");
                             }
                             console.log(data);
-                            sendEmail(destFirstName, destLastname, destEmailAddress, data);
+                            sendEmail(destFirstName, destLastname, destEmailAddress, data)
+                                .then(function() {
+                                    removeSidomeFile(idUsr);
+                                }).catch(function() {
+                                    removeSidomeFile(idUsr);
+                                });
                         });
                     });
             } else {
