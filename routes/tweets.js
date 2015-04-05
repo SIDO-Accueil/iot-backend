@@ -2,31 +2,16 @@
 "use strict";
 
 var express = require("express");
-var elasticsearch = require("elasticsearch");
+
+var elasticgetclient = require("../util/elasticsearch-getclient");
+var tweetsbyusername = require("../util/tweets-by-username");
 
 //noinspection Eslint
 var router = express.Router();
 
-// create a client instance of elasticsearch
-var client = new elasticsearch.Client({
-    host: "localhost:9200"
-    //log: "trace"
-});
+// get a client instance of elasticsearch
+var client = elasticgetclient.get();
 
-// small check to ensure the status of the elasticsearch cluster
-client.cluster.health()
-    .then(function(resp) {
-        if (resp.status !== "green") {
-            console.log("Please check unassigned_shards");
-        } else {
-            console.log("ElasticSearch: OK");
-        }
-    }, function (error) {
-        console.trace(error.message);
-    });
-
-
-/* GET tweets listing. */
 router.get("/", function(req, res) {
     client.search({
         "index": "twitter",
@@ -49,6 +34,18 @@ router.get("/", function(req, res) {
         res.status(500);
         res.send({});
     });
+});
+
+/* GET tweets listing. */
+router.get("/:id", function(req, res) {
+    var id = req.params.id;
+    tweetsbyusername.countof(id)
+        .then(function (count) {
+            res.send({"count": count});
+        })
+        .catch(function (err) {
+            console.error(err);
+        });
 });
 
 module.exports = router;

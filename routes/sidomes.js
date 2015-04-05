@@ -8,6 +8,8 @@ var moment = require("moment");
 var sidomesaddrm = require("../util/sidome-inout-model");
 var sidomefactory = require("../util/sidome-factory").getSidome;
 var elasticgetclient = require("../util/elasticsearch-getclient");
+var tweetsbyusername = require("../util/tweets-by-username");
+var twitterusername = require("../util/twitter-username");
 
 var ROTATION_TIME_SEC = 60;
 
@@ -16,19 +18,6 @@ var router = express.Router();
 
 // get a client instance of elasticsearch
 var client = elasticgetclient.get();
-
-// small check to ensure the status of the elasticsearch cluster
-client.cluster.health()
-    .then(function(resp) {
-        if (resp.status !== "green") {
-            console.log("Please check unassigned_shards");
-        } else {
-            console.log("ElasticSearch: OK");
-        }
-    }, function (error) {
-        console.trace(error.message);
-    });
-
 
 router.get("/all", function(req, res) {
     client.search({
@@ -83,23 +72,6 @@ router.get("/", function(req, res) {
             }
         });
 
-        fromTableToAdd.forEach(function(s) {
-            // update each sidome that will be shown at the screen
-            s.visible = true;
-            s.lastDisplayed = moment().unix();
-
-            client.index({
-                index: "sidomes",
-                type: "sidomes",
-                id: s.id,
-                body: s
-            }).then(function() {
-
-            }, function (error) {
-                console.trace(error.message);
-            });
-        });
-
         var fromTableToRm = allSidomes.filter(function(s) {
             if (s.visible) {
                 var lastDisplayed = moment.unix(s.lastDisplayed);
@@ -132,11 +104,60 @@ router.get("/", function(req, res) {
            return {"id": s.id};
         });
 
-        //noinspection Eslint
-        var ans = sidomesaddrm.responseFactory(anonPersonCount,
-                                               fromTableToAdd, fromTableToRmIds);
+        var promisesAddTweets = [];
+        var fromTableToAddWithTweets = [];
 
-        res.send(ans);
+        fromTableToAdd.forEach(function(s) {
+            // update each sidome that will be shown at the screen
+            s.visible = true;
+            s.lastDisplayed = moment().unix();
+
+            promisesAddTweets.push(
+                new Promise(function(resolve, reject) {
+                    var id = s.id.replace(/^@/, "");
+                    twitterusername.getUsername(id)
+                        .then(function (username) {
+                            tweetsbyusername.countof(username)
+                                .then(function (count) {
+                                    s.tweets = count;
+                                    fromTableToAddWithTweets.push(s);
+                                    resolve(s);
+                                })
+                                .catch(function (err) {
+                                    console.error(err);
+                                    s.tweets = 0;
+                                    fromTableToAddWithTweets.push(s);
+                                    reject(err);
+                                });
+                        })
+                        .catch(function (err) {
+                            console.error(err);
+                            s.tweets = 0;
+                            fromTableToAddWithTweets.push(s);
+                            reject(err);
+                        });
+                })
+            );
+
+            client.index({
+                index: "sidomes",
+                type: "sidomes",
+                id: s.id,
+                body: s
+            }).then(function() {
+
+            }, function (error) {
+                console.trace(error.message);
+            });
+        });
+
+        Promise.all(promisesAddTweets).then(function () {
+            var ans = sidomesaddrm.responseFactory(anonPersonCount,
+                fromTableToAddWithTweets, fromTableToRmIds);
+            console.log("we got tweets counts");
+            res.send(ans);
+        });
+
     }, function (error) {
         console.trace(error.message);
         res.status(200);

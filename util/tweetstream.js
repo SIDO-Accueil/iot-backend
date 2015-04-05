@@ -42,17 +42,19 @@ var nextBackoff = function () {
 var getStreams = function (hashtagslist, lang) {
     console.log("getstream ok");
 
-    var hts = hashtagslist.reduce(function(e,a){return e+","+a;});
+    var hts = hashtagslist.reduce(function(e, a){
+        return e + "," + a;
+    });
 
     client.stream("statuses/filter",
         {track: hts, language: lang}, function (stream) {
 
         stream.on("data", function (tweet) {
-            console.log("new tweet:" + tweet.created_at + ", lang: " + tweet.lang);
+            console.log("new tweet:" + tweet.created_at + ", lang: " + tweet.lang + "," + tweet.text);
 
-            var hts = [];
+            var htsi = [];
             tweet.entities.hashtags.forEach(function(e) {
-               hts.push(e.text);
+               htsi.push(e.text);
             });
 
             var mentions = [];
@@ -60,7 +62,7 @@ var getStreams = function (hashtagslist, lang) {
                 mentions.push(e.screen_name);
             });
 
-            if (tweet.lang === "en") {
+            if (tweet.lang === "fr") {
                 elasticClient.index({
                     index: "twitter",
                     type: "tweets",
@@ -69,7 +71,7 @@ var getStreams = function (hashtagslist, lang) {
                         "usr": tweet.user.screen_name,
                         "name": tweet.user.name,
                         "txt": tweet.text,
-                        "hashtags": hts,
+                        "hashtags": htsi,
                         "mentions": mentions
                     }
                 });

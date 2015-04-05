@@ -28,7 +28,7 @@ var hashtags = [
     "iot", "sido", "objetsconnectes", "sidoevent", "gmc", "innovationdating"
     //"javascript", "angularjs", "backbone", "scala", "browserify", "iojs", "java", "apple"
 ];
-var lang = "en";
+var lang = "fr";
 tweetstream.getStreams(hashtags, lang);
 
 // CORS enable
