@@ -138,8 +138,10 @@ router.post("/:id", function(req, res) {
 
                 fs.writeFile("./sidomes-png/out-" + idUsr + ".png",
                     base64Data, "base64", function(err) {
-                        console.log(err);
-                        console.log("CANNOT WRITE " + "./sidomes-png/out-" + idUsr + ".png");
+                        if (err) {
+                            console.log(err);
+                            console.log("CANNOT WRITE " + "./sidomes-png/out-" + idUsr + ".png");
+                        }
                     });
 
                 im.convert(["./sidomes-png/out-" + idUsr + ".png",
