@@ -43,10 +43,12 @@ router.get("/last", function(req, res) {
     lasttweet.lastTweet()
         .then(function (tweet) {
             console.log("ok");
-            res.send(tweet);
+            tweet.txt = tweet.txt.replace(/http:\/\/[^ ]* /, "");
+            res.send();
         }).catch(function (err) {
+            console.err(err);
             res.send({});
-        })
+        });
 });
 
 module.exports = router;

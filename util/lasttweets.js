@@ -31,6 +31,7 @@ var lastTweet = function() {
         queryElastic
             .then(function(data) {
                 console.log("{user: " + data.hits.hits[0]._source.usr + ", txt: " + data.hits.hits[0]._source.txt + "}");
+                //noinspection Eslint
                 resolve({
                     user: data.hits.hits[0]._source.usr,
                     txt: data.hits.hits[0]._source.txt
@@ -38,7 +39,6 @@ var lastTweet = function() {
             })
             .catch(function(err) {
                 console.error(err);
-                console.log("{id: " + username + ", nbtweets: " + err + "}");
                 reject(err);
             });
     });
