@@ -3,6 +3,7 @@
 
 var Twitter = require("twitter");
 var elasticgetclient = require("../util/elasticsearch-getclient");
+var moment = require("moment");
 
 if (!process.env.TWITTER_CONSUMER_KEY || !process.env.TWITTER_CONSUMER_SECRET ||
     !process.env.TWITTER_ACCESS_TOKEN_KEY || !process.env.TWITTER_ACCESS_TOKEN_SECRET) {
@@ -51,7 +52,6 @@ var getStreams = function (hashtagslist, lang) {
 
         stream.on("data", function (tweet) {
             console.log("new tweet:" + tweet.created_at + ", lang: " + tweet.lang + "," + tweet.text);
-
             var htsi = [];
             tweet.entities.hashtags.forEach(function(e) {
                htsi.push(e.text);
@@ -72,7 +72,8 @@ var getStreams = function (hashtagslist, lang) {
                         "name": tweet.user.name,
                         "txt": tweet.text,
                         "hashtags": htsi,
-                        "mentions": mentions
+                        "mentions": mentions,
+                        "date": moment().unix()
                     }
                 });
             }

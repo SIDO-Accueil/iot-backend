@@ -5,6 +5,7 @@ var express = require("express");
 
 var elasticgetclient = require("../util/elasticsearch-getclient");
 var tweetsbyusername = require("../util/tweets-by-username");
+var lasttweet = require("../util/lasttweets");
 
 //noinspection Eslint
 var router = express.Router();
@@ -37,15 +38,15 @@ router.get("/", function(req, res) {
 });
 
 /* GET tweets listing. */
-router.get("/:id", function(req, res) {
-    var id = req.params.id;
-    tweetsbyusername.countof(id)
-        .then(function (count) {
-            res.send({"count": count});
+router.get("/last", function(req, res) {
+    console.log("/last");
+    lasttweet.lastTweet()
+        .then(function (tweet) {
+            console.log("ok");
+            res.send(tweet);
+        }).catch(function (err) {
+            res.send({});
         })
-        .catch(function (err) {
-            console.error(err);
-        });
 });
 
 module.exports = router;
