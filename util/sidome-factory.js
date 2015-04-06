@@ -1,17 +1,45 @@
 /*eslint-env node*/
 
-var fs = require("fs");
+"use strict";
+
+//noinspection Eslint
 var Promise = require("bluebird");
 var readFile = Promise.promisify(require("fs").readFile);
+var fs = require("fs");
+
+function getSidomeImage(numsidome) {
+    return new Promise(function (resolve, reject) {
+        var numStr;
+        if (numsidome.length <= 1 || numsidome < 10) {
+            numStr = "0" + numsidome;
+        } else {
+            numStr = numsidome;
+        }
+
+        var sidomePath = "./util/PNGSidome/" + numStr + ".json";
+
+        fs.readFile(sidomePath, function (err, data) {
+            if (err) {
+                console.log(err);
+                console.log("CANNOT READ " + sidomePath);
+                reject(err);
+            } else {
+                console.log(data);
+                resolve(data);
+            }
+        });
+    });
+}
+
 
 function getSidome(badge, numsidome) {
-    "use strict";
 
     return new Promise(function (resolve, reject) {
+        var numStr;
         if (numsidome.length <= 1 || numsidome < 10) {
-            var numStr = "0" + numsidome;
+            numStr = "0" + numsidome;
         } else {
-            var numStr = numsidome;
+            numStr = numsidome;
         }
 
         var sidomePath = "./util/JSONSidome/" + numStr + ".json";
@@ -32,5 +60,6 @@ function getSidome(badge, numsidome) {
 }
 
 module.exports = {
+    getSidomeImage: getSidomeImage,
     getSidome: getSidome
 };

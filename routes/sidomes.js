@@ -7,10 +7,12 @@ var express = require("express");
 var moment = require("moment");
 
 var sidomesaddrm = require("../util/sidome-inout-model");
-var sidomefactory = require("../util/sidome-factory").getSidome;
+var sidomefactory = require("../util/sidome-factory");
 var elasticgetclient = require("../util/elasticsearch-getclient");
 var tweetsbyusername = require("../util/tweets-by-username");
 var twitterusername = require("../util/twitter-username");
+var personfind = require("../util/personfind");
+var sendmail = require("../util/sendMail");
 
 var ROTATION_TIME_SEC = 60;
 
@@ -19,6 +21,89 @@ var router = express.Router();
 
 // get a client instance of elasticsearch
 var client = elasticgetclient.get();
+
+var fixSidomeColor = function (sidome) {
+    var color = sidome.color;
+    color.r = Math.round(color.r, 0);
+    color.g = Math.round(color.g, 0);
+    color.b = Math.round(color.b, 0);
+    return sidome;
+};
+
+var updateSidome = function(newSidome, res) {
+    var now = moment();
+    newSidome.lastModified = now.unix();
+    newSidome.visible = false;
+    newSidome = fixSidomeColor(newSidome);
+
+    client.search({
+        "index": "sidomes",
+        "q": newSidome.id
+    }).then(function (body) {
+
+        if (body.hits.total > 1) {
+            // multiples results matchs
+            // error 500
+            res.status(500);
+            res.send({});
+
+        } else if (body.hits.total === 0) {
+            // 404
+            res.status(404);
+            res.send({});
+        } else {
+
+            // the existing sidome has been found
+            // let's update it
+
+            client.index({
+                index: "sidomes",
+                type: "sidomes",
+                id: newSidome.id,
+                body: newSidome
+            }).then(function() {
+                res.status(200);
+                res.send();
+            }, function (error) {
+                console.trace(error.message);
+                res.status(500);
+                res.send({});
+            });
+        }
+    }, function (error) {
+        console.trace(error.message);
+        res.status(404);
+        res.send({});
+    });
+};
+
+var addSidome = function (sidome, res) {
+    var now = moment();
+    sidome.lastModified = now.unix();
+    sidome.visible = false;
+    sidome = fixSidomeColor(sidome);
+
+    client.index({
+        index: "sidomes",
+        type: "sidomes",
+        id: sidome.id,
+        body: sidome
+    }).then(function(d) {
+        if (!d.created) {
+            client.search({
+                "index": "sidomes",
+                "q": sidome.id
+            }).then(function (body) {
+                res.status(409);
+                //noinspection Eslint
+                res.send(body.hits.hits[0]._source);
+            });
+        } else {
+            res.status(201);
+            res.send({"created": d.created});
+        }
+    });
+};
 
 router.get("/all", function(req, res) {
     client.search({
@@ -63,7 +148,7 @@ router.get("/", function(req, res) {
                 ++sidomesVisiblesTotal;
             }
         });
-        var ratioSidomesVisibles = sidomesVisiblesTotal/sidomesPersoTotal;
+        var ratioSidomesVisibles = sidomesVisiblesTotal / sidomesPersoTotal;
         console.log("ratio visible/persoTotal:" + ratioSidomesVisibles);
 
 
@@ -229,61 +314,6 @@ router.get("/:id", function(req, res) {
     });
 });
 
-var fixSidomeColor = function (sidome) {
-    var color = sidome.color;
-    color.r = Math.round(color.r, 0);
-    color.g = Math.round(color.g, 0);
-    color.b = Math.round(color.b, 0);
-    return sidome;
-};
-
-var updateSidome = function(newSidome, res) {
-    var now = moment();
-    newSidome.lastModified = now.unix();
-    newSidome.visible = false;
-    newSidome = fixSidomeColor(newSidome);
-
-    client.search({
-        "index": "sidomes",
-        "q": newSidome.id
-    }).then(function (body) {
-
-        if (body.hits.total > 1) {
-            // multiples results matchs
-            // error 500
-            res.status(500);
-            res.send({});
-
-        } else if (body.hits.total === 0) {
-            // 404
-            res.status(404);
-            res.send({});
-        } else {
-
-            // the existing sidome has been found
-            // let's update it
-
-            client.index({
-                index: "sidomes",
-                type: "sidomes",
-                id: newSidome.id,
-                body: newSidome
-            }).then(function() {
-                res.status(200);
-                res.send();
-            }, function (error) {
-                console.trace(error.message);
-                res.status(500);
-                res.send({});
-            });
-        }
-    }, function (error) {
-        console.trace(error.message);
-        res.status(404);
-        res.send({});
-    });
-};
-
 router.put("/", function(req, res) {
     var p = req.body;
 
@@ -307,34 +337,6 @@ router.put("/", function(req, res) {
     }
 });
 
-var addSidome = function (sidome, res) {
-    var now = moment();
-    sidome.lastModified = now.unix();
-    sidome.visible = false;
-    sidome = fixSidomeColor(sidome);
-
-    client.index({
-        index: "sidomes",
-        type: "sidomes",
-        id: sidome.id,
-        body: sidome
-    }).then(function(d) {
-        if (!d.created) {
-            client.search({
-                "index": "sidomes",
-                "q": sidome.id
-            }).then(function (body) {
-                res.status(409);
-                //noinspection Eslint
-                res.send(body.hits.hits[0]._source);
-            });
-        } else {
-            res.status(201);
-            res.send({"created": d.created});
-        }
-    });
-};
-
 router.post("/", function(req, res) {
     var p = req.body;
 
@@ -351,12 +353,43 @@ router.post("/", function(req, res) {
         addSidome(p, res);
     } else {
         // 'p' sidome come from an mobile application
+
+        // searching the persons informations
+        personfind.search(p.id)
+            .then(function(userinfo) {
+
+                // get the sidome image
+                sidomefactory.getSidomeImage(p.numsidome)
+                    .then(function(image) {
+
+                        // send the mail
+                        sendmail.send(userinfo.firstname, userinfo.lastname, userinfo.email, image)
+                            .then(function() {
+                                console.log("mail successfull sended to:", userinfo.email);
+                                res.send({});
+                            }).catch(function() {
+                                console.err("CANNOT send mail to:", userinfo.email);
+                                res.send({});
+                            });
+                    }).catch(function(err) {
+                        console.err("CANNOT get image of the sidome number: ", p.numsidome, ", ", err);
+                        res.send({});
+                    });
+
+            })
+            .catch(function(err) {
+                console.err(err);
+                console.err("CANNOT FIND PERSON:", p.id);
+                res.send({});
+            });
+
         // search from the 32 sidomes list and construct the associated sidome
-        sidomefactory(p.id, p.numsidome)
+        sidomefactory.getSidome(p.id, p.numsidome)
             .then(function(sidome) {
                 addSidome(sidome, res);
             }).catch(function(err) {
-                res.send(err);
+                console.err("CANNOT get JSON of the sidome number: ", p.numsidome, ", ", err);
+                res.send({});
             });
     }
 });
