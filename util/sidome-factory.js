@@ -16,7 +16,7 @@ function getSidomeImage(numsidome) {
             numStr = numsidome;
         }
 
-        var sidomePath = "./util/PNGSidome/" + numStr + ".json";
+        var sidomePath = "./util/PNGSidome/" + numStr + ".png";
 
         fs.readFile(sidomePath, function (err, data) {
             if (err) {
@@ -30,7 +30,6 @@ function getSidomeImage(numsidome) {
         });
     });
 }
-
 
 function getSidome(badge, numsidome) {
 
