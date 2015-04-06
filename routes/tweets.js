@@ -4,7 +4,6 @@
 var express = require("express");
 
 var elasticgetclient = require("../util/elasticsearch-getclient");
-var tweetsbyusername = require("../util/tweets-by-username");
 var lasttweet = require("../util/lasttweets");
 
 //noinspection Eslint
@@ -43,8 +42,8 @@ router.get("/last", function(req, res) {
     lasttweet.lastTweet()
         .then(function (tweet) {
             console.log("ok");
-            tweet.txt = tweet.txt.replace(/http:\/\/[^ ]* /, "");
-            res.send();
+            tweet.txt = tweet.txt.replace(/http:\/\/[^ ]*/, "");
+            res.send(tweet);
         }).catch(function (err) {
             console.err(err);
             res.send({});
