@@ -14,7 +14,9 @@ var lastTweet = function() {
             json: {
                 "size": 1,
                 "query": {
-                    "match_all": {}
+                    "term": {
+                        "tweets.hashtags": "sido"
+                    }
                 },
                 "sort": [
                     {
