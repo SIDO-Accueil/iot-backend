@@ -132,8 +132,13 @@ router.get("/all", function(req, res) {
 router.get("/", function(req, res) {
     client.search({
         "index": "sidomes",
-        "size": 10,
-        "q": "*"
+        "size": 20,
+        "q": {
+            "function_score": {
+                "query": { "match_all": {} },
+                "random_score": {}
+            }
+        }
     }).then(function (body) {
 
         // get all sidomes !!
