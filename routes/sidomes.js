@@ -12,7 +12,7 @@ var elasticgetclient = require("../util/elasticsearch-getclient");
 var personfind = require("../util/personfind");
 var sendmail = require("../util/sendMail");
 
-var ROTATION_TIME_SEC = 60;
+var ROTATION_TIME_SEC = 180;
 
 //noinspection Eslint
 var router = express.Router();
@@ -210,7 +210,8 @@ router.get("/", function(req, res) {
                      !oldToRm.some(function(s2) { return s2.id === s.id; }) &&
                      Math.random() > ratioSidomesVisibles
                     ) {
-                    // olds ones, not visibles ones, and only if there is not much sidomes shown
+                        // olds ones, not visibles ones, and only if there is not much sidomes shown
+                        s.old = true;
                         console.log("old sidome chosen to be shown:" + s.id);
                         recentsToAdd.push(s);
                 }
@@ -236,7 +237,9 @@ router.get("/", function(req, res) {
         });
 
         recentsToAdd.forEach(function(s) {
-            s.fromTable = true;
+            if (!s.old) {
+                s.fromTable = true;
+            }
         });
 
         var ans = sidomesaddrm.responseFactory(anonPersonCount,
