@@ -132,7 +132,7 @@ router.get("/all", function(req, res) {
 router.get("/", function(req, res) {
     client.search({
         "index": "sidomes",
-        "size": 10000,
+        "size": 1000,
         "q": "*"
     }).then(function (body) {
 
@@ -219,40 +219,10 @@ router.get("/", function(req, res) {
             }
         });
 
-        var promisesAddTweets = [];
-        var recentsToAddWithTweets = [];
-
         recentsToAdd.forEach(function(s) {
             // update each sidome that will be shown at the screen
             s.visible = true;
             s.lastDisplayed = moment().unix();
-
-            promisesAddTweets.push(
-                new Promise(function(resolve, reject) {
-                    var id = s.id.replace(/^@/, "");
-                    twitterusername.getUsername(id)
-                        .then(function (username) {
-                            tweetsbyusername.countof(username)
-                                .then(function (count) {
-                                    s.tweets = count;
-                                    recentsToAddWithTweets.push(s);
-                                    resolve(s);
-                                })
-                                .catch(function (err) {
-                                    console.error(err);
-                                    s.tweets = 0;
-                                    recentsToAddWithTweets.push(s);
-                                    reject(err);
-                                });
-                        })
-                        .catch(function (err) {
-                            console.error(err);
-                            s.tweets = 0;
-                            recentsToAddWithTweets.push(s);
-                            reject(err);
-                        });
-                })
-            );
 
             client.index({
                 index: "sidomes",
@@ -266,12 +236,10 @@ router.get("/", function(req, res) {
             });
         });
 
-        Promise.all(promisesAddTweets).then(function () {
-            var ans = sidomesaddrm.responseFactory(anonPersonCount,
-                recentsToAddWithTweets, oldToRmIds);
-            console.log("we got tweets counts");
-            res.send(ans);
-        });
+        var ans = sidomesaddrm.responseFactory(anonPersonCount,
+            recentsToAdd, oldToRmIds);
+        console.log("we got tweets counts");
+        res.send(ans);
 
     }, function (error) {
         console.trace(error.message);
