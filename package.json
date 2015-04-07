@@ -19,7 +19,20 @@
     "lucene",
     "avatar"
   ],
-  "author": "Raphael Cazenave-Leveque",
+  "contributors": [
+    {
+      "name": "Raphael Cazenave-Leveque",
+      "email": "raphael.cazenave@gmail.com"
+    },
+    {
+      "name": "John Thao",
+      "email": "john.thao.dev@gmail.com"
+    },
+    {
+      "name": "Adrien De Coster",
+      "email": "adrien38200@gmail.com"
+    }
+  ],
   "license": "GNU GENERAL PUBLIC LICENSE V2",
   "bugs": {
     "url": "https://github.com/StatelessCat/iot-backend/issues"
@@ -41,5 +54,6 @@
     "request-promise": "^0.4.1",
     "serve-favicon": "~2.2.0",
     "twitter": "^1.2.5"
-  }
+  },
+  "author": "Raphael Cazenave-Leveque"
 }

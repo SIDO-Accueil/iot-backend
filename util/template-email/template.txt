@@ -1,0 +1,49 @@
+Merci de votre participation au SIdO, vous trouverez en pièce jointe votre SIdôme.
+
+N'hésitez pas à Tweeter avec #SIdO par le biais de l'application SIdOsphère.
+
+Bonne visite !
+
+Application Android : https://play.google.com/store/apps/details?id=saint__y.sidosphre
+
+*L'équipe SIdO*
+
+Coordination du projet
+ Meden Agan - new creative experience
+ Cyril Raymond
+
+Partenaires entreprises
+ BIIN
+ Meden Agan
+ Boot-Start
+ Alabama événementiel et multimédia
+ PulseHeberg
+ HP CCF (Centre de Compétence France)
+
+Développement / Réalisation
+ Sous la direction de Benjamin Habegger / L'atelier des Objets connectés Boot-Start
+
+  Université Lyon 1
+   Raphaël Cazenave-Lévêque
+   Raul Leaño-Martinet
+   John Thao
+
+  Epitech
+   Alexandre Aubert
+   Nicolas Comte
+   Adrien De Coster
+   Christian Diaconu
+   Nicolas Ovejero
+   Yann Saint Quentin
+   Léo Vallet
+
+Conception / Design
+ Sous la direction de Sophie Tinland et Gilles Marion
+  Ecole La Martinière Diderot, Diplôme Supérieur de Design
+   Pierre Busserolles
+   Aurélia De Azambuja
+   Vincent Guilhermond
+   Anaïs Lamberon
+   Léo Maligorne
+   Anouck Vanesse
+   Tom Violeau
