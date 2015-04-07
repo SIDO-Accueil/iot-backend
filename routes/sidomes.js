@@ -235,6 +235,10 @@ router.get("/", function(req, res) {
             });
         });
 
+        recentsToAdd.forEach(function(s) {
+            s.fromTable = true;
+        });
+
         var ans = sidomesaddrm.responseFactory(anonPersonCount,
             recentsToAdd, oldToRmIds);
         console.log("we got tweets counts");
