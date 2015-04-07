@@ -156,6 +156,7 @@ var getVisibles = function() {
             .then(function(data) {
                 var ans = [];
                 data.hits.forEach(function(e) {
+                    //noinspection Eslint
                     ans.push(e._source);
                 });
                 resolve(ans);
@@ -168,13 +169,9 @@ var getVisibles = function() {
 
 router.get("/", function(req, res) {
 
-    getVisibles()
-        .then(function (body) {
+    getVisibles().then(function (allSidomes) {
 
-        // get all sidomes !!
-        var hits = body.hits.hits;
-        var allSidomes = [];
-        var sidomesPersoTotal = hits.length;
+        var sidomesPersoTotal = allSidomes.length;
 
         // COUNT visibles sidomes
         var sidomesVisiblesTotal = 0;
@@ -185,11 +182,6 @@ router.get("/", function(req, res) {
         });
         var ratioSidomesVisibles = sidomesVisiblesTotal / sidomesPersoTotal;
         console.log("ratio visible/persoTotal:" + ratioSidomesVisibles);
-
-        hits.forEach(function(j){
-            //noinspection Eslint
-            allSidomes.push(j._source);
-        });
 
         // get recently added sidomes from the table
         var recentsToAdd = allSidomes.filter(function(s) {
