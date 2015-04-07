@@ -5,6 +5,7 @@
 
 var express = require("express");
 var moment = require("moment");
+var rp = require("request-promise");
 
 var sidomesaddrm = require("../util/sidome-inout-model");
 var sidomefactory = require("../util/sidome-factory");
@@ -129,17 +130,46 @@ router.get("/all", function(req, res) {
     });
 });
 
-router.get("/", function(req, res) {
-    client.search({
-        "index": "sidomes",
-        "size": 20,
-        "q": {
-            "function_score": {
-                "query": { "match_all": {} },
-                "random_score": {}
+var getVisibles = function() {
+    return new Promise(function (resolve, reject) {
+        var queryElastic = rp.post({
+            uri: "http://localhost:9200/sidomes/_search",
+            method: "POST",
+            json: {
+                "query": {
+                    "bool": {
+                        "must": [
+                            {
+                                "term": {
+                                    "sidomes.visible": true
+                                }
+                            }
+                        ],
+                        "must_not": [],
+                        "should": []
+                    }
+                },
+                "size": 25
             }
-        }
-    }).then(function (body) {
+        });
+        queryElastic
+            .then(function(data) {
+                var ans = [];
+                data.hits.forEach(function(e) {
+                    ans.push(e._source);
+                });
+                resolve(ans);
+            })
+            .catch(function(err) {
+                reject(err);
+            });
+    });
+};
+
+router.get("/", function(req, res) {
+
+    getVisibles()
+        .then(function (body) {
 
         // get all sidomes !!
         var hits = body.hits.hits;
