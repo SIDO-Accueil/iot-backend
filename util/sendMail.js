@@ -19,6 +19,7 @@ var smtpParams = {
 var getEmailText = function() {
     return new Promise(function (resolve, reject) {
 
+        console.log("in getEmailText Promise");
         var templatePath = "./util/template-email/template.txt";
         readFile(templatePath, "utf8").then(function(text) {
             resolve(text);
@@ -50,7 +51,7 @@ var send = function (destFirstName, destLastname, emailAdress, image) {
         console.log("send");
         console.log(image);
 
-        getEmailText.then(function(txt) {
+        getEmailText().then(function(txt) {
             // send the message and get a callback with an error or details of the message that was sent
             server.send({
                 text: txt,
@@ -72,9 +73,7 @@ var send = function (destFirstName, destLastname, emailAdress, image) {
             });
         }).catch(function(e){
             console.err(e);
-        })
-
-
+        });
     });
 };
 
