@@ -9,8 +9,6 @@ var moment = require("moment");
 var sidomesaddrm = require("../util/sidome-inout-model");
 var sidomefactory = require("../util/sidome-factory");
 var elasticgetclient = require("../util/elasticsearch-getclient");
-var tweetsbyusername = require("../util/tweets-by-username");
-var twitterusername = require("../util/twitter-username");
 var personfind = require("../util/personfind");
 var sendmail = require("../util/sendMail");
 
@@ -222,6 +220,7 @@ router.get("/", function(req, res) {
         recentsToAdd.forEach(function(s) {
             // update each sidome that will be shown at the screen
             s.visible = true;
+            s.fromTable = false;
             s.lastDisplayed = moment().unix();
 
             client.index({
