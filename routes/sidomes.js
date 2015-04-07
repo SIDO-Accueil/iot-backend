@@ -132,7 +132,7 @@ router.get("/all", function(req, res) {
 router.get("/", function(req, res) {
     client.search({
         "index": "sidomes",
-        "size": 10000,
+        "size": 10,
         "q": "*"
     }).then(function (body) {
 
@@ -150,7 +150,6 @@ router.get("/", function(req, res) {
         });
         var ratioSidomesVisibles = sidomesVisiblesTotal / sidomesPersoTotal;
         console.log("ratio visible/persoTotal:" + ratioSidomesVisibles);
-
 
         hits.forEach(function(j){
             //noinspection Eslint
