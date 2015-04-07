@@ -155,7 +155,9 @@ var getVisibles = function() {
         queryElastic
             .then(function(data) {
                 var ans = [];
-                data.hits.forEach(function(e) {
+                data.hits.hits.forEach(function(e) {
+                    //noinspection Eslint
+                    console.log(e._source);
                     //noinspection Eslint
                     ans.push(e._source);
                 });
