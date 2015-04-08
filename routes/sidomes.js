@@ -274,6 +274,9 @@ router.get("/", function(req, res) {
         });
 
         recentsToAdd.forEach(function(s) {
+            if (!s.nbtweets) {
+                s.nbtweets = 0;
+            }
             s.tweets = s.nbtweets;
             if (!s.old) {
                 s.fromTable = true;
