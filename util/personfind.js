@@ -6,7 +6,7 @@ var Promise = require("bluebird");
 
 var elasticgetclient = require("../util/elasticsearch-getclient");
 
-// get a client instance of elasticsearch
+// get a clientTwitt instance of elasticsearch
 var client = elasticgetclient.get();
 
 var search = function(userid) {
@@ -23,7 +23,7 @@ var search = function(userid) {
         }).then(function (body) {
 
             if (body.hits.total === 1) {
-                console.log("--------------------email:--------------------------");
+                console.log("--------------------person:-----------------------");
                 //noinspection Eslint
                 console.log(body.hits.hits[0]._source.email);
                 //noinspection Eslint
@@ -36,17 +36,18 @@ var search = function(userid) {
                 var user = {
                     "email": body.hits.hits[0]._source.email,
                     "lastname": body.hits.hits[0]._source.nom,
-                    "firstname": body.hits.hits[0]._source.prenom
+                    "firstname": body.hits.hits[0]._source.prenom,
+                    "twitterid": body.hits.hits[0]._source.twitter
                 };
                 resolve(user);
 
             } else {
-                console.err({"err": "multiples persons matches :/"});
+                console.log({"err": "multiples persons matches :/"});
                 reject({"err": "multiples persons matches :/"});
             }
         }, function (error) {
             console.trace(error.message);
-            console.err({"err": "cannot find the person email :/"});
+            console.log({"err": "cannot find the person email :/"});
             reject({"err": "cannot find the person email :/"});
         });
     });

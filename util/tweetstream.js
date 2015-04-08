@@ -1,8 +1,11 @@
 /*eslint-env node*/
 "use strict";
 
+//noinspection Eslint
+var Promise = require("bluebird");
 var Twitter = require("twitter");
 var elasticgetclient = require("../util/elasticsearch-getclient");
+var sidomeByTwitterId = require("../util/sidomeByTwitterId");
 var moment = require("moment");
 
 if (!process.env.TWITTER_CONSUMER_KEY || !process.env.TWITTER_CONSUMER_SECRET ||
@@ -12,14 +15,14 @@ if (!process.env.TWITTER_CONSUMER_KEY || !process.env.TWITTER_CONSUMER_SECRET ||
 }
 
 //noinspection Eslint
-var client = new Twitter({
+var clientTwitt = new Twitter({
     consumer_key: process.env.TWITTER_CONSUMER_KEY,
     consumer_secret: process.env.TWITTER_CONSUMER_SECRET,
     access_token_key: process.env.TWITTER_ACCESS_TOKEN_KEY,
     access_token_secret: process.env.TWITTER_ACCESS_TOKEN_SECRET
 });
 
-// get a client instance of elasticsearch
+// get a clientTwitt instance of elasticsearch
 var elasticClient = elasticgetclient.get();
 
 // small check to ensure the status of the elasticsearch cluster
@@ -47,7 +50,7 @@ var getStreams = function (hashtagslist, lang) {
         return e + "," + a;
     });
 
-    client.stream("statuses/filter",
+    clientTwitt.stream("statuses/filter",
         {track: hts, language: lang}, function (stream) {
 
         stream.on("data", function (tweet) {
@@ -63,6 +66,7 @@ var getStreams = function (hashtagslist, lang) {
             });
 
             if (tweet.lang === "fr") {
+                console.log("french tweet");
                 elasticClient.index({
                     index: "twitter",
                     type: "tweets",
@@ -76,11 +80,31 @@ var getStreams = function (hashtagslist, lang) {
                         "date": moment().unix()
                     }
                 });
+
+                console.log("screenname", tweet.user.screen_name);
+
+                // increment the sidome.nbtweets if the yweet author has a registered sidome
+                sidomeByTwitterId.sidomeByTwitterId(tweet.user.screen_name).then(function(sidomeMatching) {
+                    console.log("sidome: " + sidomeMatching.id);
+                    sidomeMatching.nbtweets += 1;
+
+                    // Update the database
+                    elasticClient.index({
+                        index: "sidomes",
+                        type: "sidomes",
+                        id: sidomeMatching.id,
+                        body: sidomeMatching
+                    }).then(function () {
+                        console.log("updated:)");
+                    }, function (error) {
+                        console.trace(error.message);
+                    });
+                });
             }
         });
 
         stream.on("error", function (error) {
-            var waitXsec = new Promise(function (resolve, reject) {
+            var waitXsec = new Promise(function (resolve) {
                 setTimeout(function() {
                     resolve();
                 }, nextBackoff());

@@ -17,6 +17,7 @@ var tweets = require("./routes/tweets");
 var image = require("./routes/image");
 var stats = require("./routes/stats");
 var anonPersons = require("./routes/anonPerson");
+var sidometweetfix = require("./routes/sidometweetfix");
 
 var app = express();
 
@@ -66,6 +67,7 @@ app.use("/tweets", tweets);
 app.use("/image", image);
 app.use("/stats", stats);
 app.use("/anonpersons", anonPersons);
+app.use("/sidometweetfix", sidometweetfix);
 
 // global anonperson counter
 //noinspection Eslint

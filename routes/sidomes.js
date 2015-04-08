@@ -5,6 +5,7 @@
 
 var express = require("express");
 var moment = require("moment");
+var rp = require("request-promise");
 
 var sidomesaddrm = require("../util/sidome-inout-model");
 var sidomefactory = require("../util/sidome-factory");
@@ -17,7 +18,7 @@ var ROTATION_TIME_SEC = 180;
 //noinspection Eslint
 var router = express.Router();
 
-// get a client instance of elasticsearch
+// get a clientTwitt instance of elasticsearch
 var client = elasticgetclient.get();
 
 var fixSidomeColor = function (sidome) {
@@ -34,44 +35,59 @@ var updateSidome = function(newSidome, res) {
     newSidome.visible = false;
     newSidome = fixSidomeColor(newSidome);
 
-    client.search({
-        "index": "sidomes",
-        "q": newSidome.id
-    }).then(function (body) {
+    rp.post({
+        uri: "http://localhost:9200/persons/_refresh",
+        method: "POST"
+    }).then(function() {
 
-        if (body.hits.total > 1) {
-            // multiples results matchs
-            // error 500
-            res.status(500);
-            res.send({});
+        personfind.search(newSidome.id)
+            .then(function (personInfo) {
 
-        } else if (body.hits.total === 0) {
-            // 404
-            res.status(404);
-            res.send({});
-        } else {
+                client.search({
+                    "index": "sidomes",
+                    "q": newSidome.id
+                }).then(function (body) {
 
-            // the existing sidome has been found
-            // let's update it
+                    if (body.hits.total > 1) {
+                        // multiples results matchs
+                        // error 500
+                        res.status(500);
+                        res.send({});
 
-            client.index({
-                index: "sidomes",
-                type: "sidomes",
-                id: newSidome.id,
-                body: newSidome
-            }).then(function() {
-                res.status(200);
-                res.send();
-            }, function (error) {
-                console.trace(error.message);
-                res.status(500);
-                res.send({});
+                    } else if (body.hits.total === 0) {
+                        // 404
+                        res.status(404);
+                        res.send({});
+                    } else {
+
+                        // the existing sidome has been found
+                        // let's update it
+
+                        var twitterid = personInfo.twitterid;
+                        var fixedtwitterid = twitterid.replace(/[^ ]*\//, "").replace(/@/, "").replace(/[^@]*@/, "");
+                        newSidome.twitterid = fixedtwitterid;
+                        newSidome.nbtweets = 0;
+
+                        client.index({
+                            index: "sidomes",
+                            type: "sidomes",
+                            id: newSidome.id,
+                            body: newSidome
+                        }).then(function () {
+                            res.status(200);
+                            res.send();
+                        }, function (error) {
+                            console.trace(error.message);
+                            res.status(500);
+                            res.send({});
+                        });
+                    }
+                }, function (error) {
+                    console.trace(error.message);
+                    res.status(404);
+                    res.send({});
+                });
             });
-        }
-    }, function (error) {
-        console.trace(error.message);
-        res.status(404);
-        res.send({});
     });
 };
 
@@ -81,26 +97,47 @@ var addSidome = function (sidome, res) {
     sidome.visible = false;
     sidome = fixSidomeColor(sidome);
 
-    client.index({
-        index: "sidomes",
-        type: "sidomes",
-        id: sidome.id,
-        body: sidome
-    }).then(function(d) {
-        if (!d.created) {
-            client.search({
-                "index": "sidomes",
-                "q": sidome.id
-            }).then(function (body) {
-                res.status(409);
-                //noinspection Eslint
-                res.send(body.hits.hits[0]._source);
+    rp.post({
+        uri: "http://localhost:9200/persons/_refresh",
+        method: "POST"
+    }).then(function(){
+
+        personfind.search(sidome.id)
+            .then(function(personInfo) {
+
+                var twitterid = personInfo.twitterid;
+                var fixedtwitterid = twitterid.replace(/[^ ]*\//, "").replace(/@/, "").replace(/[^@]*@/, "");
+                sidome.twitterid = fixedtwitterid;
+                sidome.nbtweets = 0;
+
+                client.index({
+                    index: "sidomes",
+                    type: "sidomes",
+                    id: sidome.id,
+                    body: sidome
+                }).then(function(d) {
+                    if (!d.created) {
+                        client.search({
+                            "index": "sidomes",
+                            "q": sidome.id
+                        }).then(function (body) {
+                            res.status(409);
+                            //noinspection Eslint
+                            res.send(body.hits.hits[0]._source);
+                        });
+                    } else {
+                        res.status(201);
+                        res.send({"created": d.created});
+                    }
+                });
+
+            }).catch(function(err) {
+                console.err(err);
+                console.err("CANNOT FIND PERSON:", sidome.id);
+                res.send({});
             });
-        } else {
-            res.status(201);
-            res.send({"created": d.created});
-        }
     });
+
 };
 
 router.get("/all", function(req, res) {
@@ -292,7 +329,7 @@ router.put("/", function(req, res) {
     var p = req.body;
 
     if (!p.numsidome) {
-        // 'newSidome' sidome come from the web client application
+        // 'newSidome' sidome come from the web clientTwitt application
         var newSidome = p;
 
         // fix sidome format
@@ -315,7 +352,7 @@ router.post("/", function(req, res) {
     var p = req.body;
 
     if (!p.numsidome) {
-        // 'p' sidome come from the web client application
+        // 'p' sidome come from the web clientTwitt application
 
         // fix sidome format
         p.fromTable = true;
