@@ -113,7 +113,7 @@ router.patch("/foreachtweetstosidome", function(req, res) {
             var tweetAuthor = t.usr;
             var tweetTxt = t.txt;
 
-            sidomeByTwitterId.sidomeByTwitterId(tweetAuthor).then(function(sidomeMatching) {
+            sidomeByTwitterId.sidomeByTwitterIdDelay(tweetAuthor).then(function(sidomeMatching) {
                 console.log("sidome: " + sidomeMatching.id);
                 sidomeMatching.nbtweets += 1;
 
