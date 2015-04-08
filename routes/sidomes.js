@@ -13,7 +13,7 @@ var elasticgetclient = require("../util/elasticsearch-getclient");
 var personfind = require("../util/personfind");
 var sendmail = require("../util/sendMail");
 
-var ROTATION_TIME_SEC = 180;
+var ROTATION_TIME_SEC = 120;
 
 //noinspection Eslint
 var router = express.Router();
@@ -274,6 +274,7 @@ router.get("/", function(req, res) {
         });
 
         recentsToAdd.forEach(function(s) {
+            s.tweets = s.nbtweets;
             if (!s.old) {
                 s.fromTable = true;
             }
